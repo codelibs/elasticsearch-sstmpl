@@ -13,6 +13,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.support.ActionFilter;
 import org.elasticsearch.action.support.ActionFilterChain;
 import org.elasticsearch.common.bytes.BytesReference;
+import org.elasticsearch.common.bytes.PagedBytesReference;
 import org.elasticsearch.common.component.AbstractComponent;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
@@ -124,11 +125,23 @@ public class SearchActionFilter extends AbstractComponent implements
         }
 
         searchRequest.templateName(null);
-        searchRequest.templateSource(null);
+        searchRequest.templateSource(null, false);
         searchRequest.templateType(null);
-        searchRequest.source(result.toString());
+        searchRequest.source(getResultAsString(result));
 
         return searchRequest;
+    }
+
+    private String getResultAsString(Object result) {
+        if (result instanceof String) {
+            return result.toString();
+        } else if (result instanceof PagedBytesReference) {
+            return ((BytesReference) result).toUtf8();
+        } else {
+            throw new ScriptTemplateException(
+                    "The result of script-based search template is " + result
+                            + ".");
+        }
     }
 
     @Override

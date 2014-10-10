@@ -7,7 +7,7 @@ This plugin provides Script-based Search Template.
 Elasticsearch has [Search Template](http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-template.html "Search Template") which is Mustache-based template.
 Since Mustache is Logic-less templates, you cannot put any logic, such as if-statement, into a search template.
 This plugin executes a script-based search template to create a search query.
-Therefore, you can use any script you want.
+Therefore, you can use any script you want in Search Template.
 
 ## Version
 
@@ -34,6 +34,7 @@ In this plugin, to use Script-based Search Template, "lang" property is added.
 
 For examples in this page, groovy is used as a script language.
 If you want to use other language, please add a script feature(plugin) to your Elasticsearch.
+We also provides [Handlebars Lang Plugin](https://github.com/codelibs/elasticsearch-lang-handlebars "Handlebars Lang Plugin").
 
 ### Filling in a query string with a single value
 

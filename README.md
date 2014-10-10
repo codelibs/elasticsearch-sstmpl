@@ -11,9 +11,10 @@ Therefore, you can use any script you want.
 
 ## Version
 
-| Taste     | Elasticsearch |
+| Version   | Elasticsearch |
 |:---------:|:-------------:|
 | master    | 1.4.X         |
+| 1.4.0     | 1.4.0.Beta1   |
 
 ### Issues/Questions
 
@@ -23,8 +24,6 @@ Please file an [issue](https://github.com/codelibs/elasticsearch-extension/issue
 ## Installation
 
 ### Install Script-based Search Template Plugin
-
-TBD
 
     $ $ES_HOME/bin/plugin --install org.codelibs/elasticsearch-sstmpl/1.4.0
 

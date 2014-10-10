@@ -25,22 +25,36 @@ import com.google.common.io.Files;
 public class ScriptTemplatePluginTest {
     ElasticsearchClusterRunner runner;
 
+    private File esHomeDir;
+
     @Before
     public void setUp() throws Exception {
+        esHomeDir = File.createTempFile("eshome", "");
+        esHomeDir.delete();
+
+        File scriptDir = new File(esHomeDir, "config/scripts");
+        scriptDir.mkdirs();
+        File scriptFile = new File(scriptDir, "search_query_2.groovy");
+        Files.write(
+                "'{\"query\":{\"match\":{\"'+my_field+'\":\"'+my_value+'\"}},\"size\":\"'+my_size+'\"}'"
+                        .getBytes(), scriptFile);
+
         runner = new ElasticsearchClusterRunner();
         runner.onBuild(new ElasticsearchClusterRunner.Builder() {
             @Override
             public void build(final int number, final Builder settingsBuilder) {
                 settingsBuilder.put("http.cors.enabled", true);
             }
-        }).build(newConfigs().numOfNode(1).ramIndexStore());
+        }).build(
+                newConfigs().numOfNode(1).ramIndexStore()
+                        .basePath(esHomeDir.getAbsolutePath()));
         runner.ensureGreen();
     }
 
     @After
     public void tearDown() throws Exception {
         runner.close();
-        runner.clean();
+        esHomeDir.delete();
     }
 
     @Test
@@ -49,6 +63,7 @@ public class ScriptTemplatePluginTest {
         assertThat(1, is(runner.getNodeSize()));
 
         Node node = runner.node();
+
         final String index = "sample";
         final String type = "data";
         runner.createIndex(index, ImmutableSettings.builder().build());
@@ -67,14 +82,6 @@ public class ScriptTemplatePluginTest {
                 .execute()) {
             assertThat(201, is(curlResponse.getHttpStatusCode()));
         }
-
-        String pathConf = node.settings().get("path.conf");
-        File scriptDir = new File(pathConf, "scripts");
-        scriptDir.mkdirs();
-        Files.write(
-                "'{\"query\":{\"match\":{\"'+my_field+'\":\"'+my_value+'\"}},\"size\":\"'+my_size+'\"}'"
-                        .getBytes(), new File(scriptDir,
-                        "search_query_2.groovy"));
 
         String query;
 
@@ -120,20 +127,6 @@ public class ScriptTemplatePluginTest {
         }
 
         query = "{\"lang\":\"groovy\",\"template\":\"'{\\\"query\\\":{\\\"match\\\":{\\\"'+my_field+'\\\":\\\"'+my_value+'\\\"}},\\\"size\\\":\\\"'+my_size+'\\\"}'\","
-                + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
-        try (CurlResponse curlResponse = Curl
-                .post(node, "/" + index + "/" + type + "/_search/template")
-                .body(query).execute()) {
-            Map<String, Object> contentMap = curlResponse.getContentAsMap();
-            Map<String, Object> hitsMap = (Map<String, Object>) contentMap
-                    .get("hits");
-            assertThat(100, is(hitsMap.get("total")));
-            assertThat(
-                    50,
-                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
-        }
-
-        query = "{\"lang\":\"groovy\",\"template\":{\"id\":\"search_query_1\"},"
                 + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
         try (CurlResponse curlResponse = Curl
                 .post(node, "/" + index + "/" + type + "/_search/template")

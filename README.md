@@ -1,4 +1,4 @@
-Elasticsearch Script-based Search Template Pugin
+Elasticsearch Script-based Search Template Plugin
 =======================
 
 ## Overview

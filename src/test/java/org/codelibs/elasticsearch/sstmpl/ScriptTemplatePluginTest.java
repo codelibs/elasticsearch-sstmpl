@@ -32,22 +32,24 @@ public class ScriptTemplatePluginTest {
         esHomeDir = File.createTempFile("eshome", "");
         esHomeDir.delete();
 
-        File scriptDir = new File(esHomeDir, "config/scripts");
+        final File scriptDir = new File(esHomeDir, "config/scripts");
         scriptDir.mkdirs();
-        File scriptFile = new File(scriptDir, "search_query_2.groovy");
+        final File scriptFile = new File(scriptDir, "search_query_2.groovy");
         Files.write(
                 "'{\"query\":{\"match\":{\"'+my_field+'\":\"'+my_value+'\"}},\"size\":\"'+my_size+'\"}'"
-                        .getBytes(), scriptFile);
+                .getBytes(), scriptFile);
 
         runner = new ElasticsearchClusterRunner();
         runner.onBuild(new ElasticsearchClusterRunner.Builder() {
             @Override
             public void build(final int number, final Builder settingsBuilder) {
                 settingsBuilder.put("http.cors.enabled", true);
+                settingsBuilder.put("plugin.types",
+                        "org.codelibs.elasticsearch.sstmpl.TestPugin");
             }
         }).build(
                 newConfigs().numOfNode(1).ramIndexStore()
-                        .basePath(esHomeDir.getAbsolutePath()));
+                .basePath(esHomeDir.getAbsolutePath()));
         runner.ensureGreen();
     }
 
@@ -62,7 +64,7 @@ public class ScriptTemplatePluginTest {
 
         assertThat(1, is(runner.getNodeSize()));
 
-        Node node = runner.node();
+        final Node node = runner.node();
 
         final String index = "sample";
         final String type = "data";
@@ -71,8 +73,8 @@ public class ScriptTemplatePluginTest {
         for (int i = 1; i <= 1000; i++) {
             final IndexResponse indexResponse = runner.insert(index, type,
                     String.valueOf(i), "{\"id\":\"" + i + "\",\"msg\":\"test "
-                            + i + "\",\"counter\":" + i + ",\"category\":"
-                            + (i % 10) + "}");
+                            + i + "\",\"counter\":" + i + ",\"category\":" + i
+                            % 10 + "}");
             assertTrue(indexResponse.isCreated());
         }
 
@@ -89,8 +91,9 @@ public class ScriptTemplatePluginTest {
         try (CurlResponse curlResponse = Curl
                 .post(node, "/" + index + "/" + type + "/_search").body(query)
                 .execute()) {
-            Map<String, Object> contentMap = curlResponse.getContentAsMap();
-            Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
                     .get("hits");
             assertThat(1000, is(hitsMap.get("total")));
             assertThat(
@@ -103,8 +106,9 @@ public class ScriptTemplatePluginTest {
         try (CurlResponse curlResponse = Curl
                 .post(node, "/" + index + "/" + type + "/_search/template")
                 .body(query).execute()) {
-            Map<String, Object> contentMap = curlResponse.getContentAsMap();
-            Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
                     .get("hits");
             assertThat(100, is(hitsMap.get("total")));
             assertThat(
@@ -117,8 +121,9 @@ public class ScriptTemplatePluginTest {
         try (CurlResponse curlResponse = Curl
                 .post(node, "/" + index + "/" + type + "/_search/template")
                 .body(query).execute()) {
-            Map<String, Object> contentMap = curlResponse.getContentAsMap();
-            Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
                     .get("hits");
             assertThat(100, is(hitsMap.get("total")));
             assertThat(
@@ -131,8 +136,9 @@ public class ScriptTemplatePluginTest {
         try (CurlResponse curlResponse = Curl
                 .post(node, "/" + index + "/" + type + "/_search/template")
                 .body(query).execute()) {
-            Map<String, Object> contentMap = curlResponse.getContentAsMap();
-            Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
                     .get("hits");
             assertThat(100, is(hitsMap.get("total")));
             assertThat(
@@ -145,8 +151,9 @@ public class ScriptTemplatePluginTest {
         try (CurlResponse curlResponse = Curl
                 .post(node, "/" + index + "/" + type + "/_search/template")
                 .body(query).execute()) {
-            Map<String, Object> contentMap = curlResponse.getContentAsMap();
-            Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
                     .get("hits");
             assertThat(100, is(hitsMap.get("total")));
             assertThat(
@@ -159,8 +166,9 @@ public class ScriptTemplatePluginTest {
         try (CurlResponse curlResponse = Curl
                 .post(node, "/" + index + "/" + type + "/_search/template")
                 .body(query).execute()) {
-            Map<String, Object> contentMap = curlResponse.getContentAsMap();
-            Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
                     .get("hits");
             assertThat(100, is(hitsMap.get("total")));
             assertThat(
@@ -173,8 +181,24 @@ public class ScriptTemplatePluginTest {
         try (CurlResponse curlResponse = Curl
                 .post(node, "/" + index + "/" + type + "/_search/template")
                 .body(query).execute()) {
-            Map<String, Object> contentMap = curlResponse.getContentAsMap();
-            Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+                    .get("hits");
+            assertThat(100, is(hitsMap.get("total")));
+            assertThat(
+                    50,
+                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
+        }
+
+        query = "{\"lang\":\"groovy\",\"template\":\"'{\\\"query\\\":{\\\"match\\\":{\\\"'+my_field+'\\\":\\\"'+my_value+'\\\"}},\\\"size\\\":\\\"'+my_size+'\\\"}'\","
+                + "\"params\":{\"my_fieldx\":\"category\",\"my_valuex\":\"1\",\"my_sizex\":\"50\"}}";
+        try (CurlResponse curlResponse = Curl
+                .post(node, "/" + index + "/" + type + "/_search/template")
+                .body(query).execute()) {
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
                     .get("hits");
             assertThat(100, is(hitsMap.get("total")));
             assertThat(

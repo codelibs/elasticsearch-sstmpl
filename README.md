@@ -14,18 +14,18 @@ Therefore, you can use any script you want in Search Template.
 | Version   | Elasticsearch |
 |:---------:|:-------------:|
 | master    | 1.4.X         |
-| 1.4.0     | 1.4.0.Beta1   |
+| 1.4.1     | 1.4.0         |
 
 ### Issues/Questions
 
-Please file an [issue](https://github.com/codelibs/elasticsearch-extension/issues "issue").
+Please file an [issue](https://github.com/codelibs/elasticsearch-sstmpl/issues "issue").
 (Japanese forum is [here](https://github.com/codelibs/codelibs-ja-forum "here").)
 
 ## Installation
 
 ### Install Script-based Search Template Plugin
 
-    $ $ES_HOME/bin/plugin --install org.codelibs/elasticsearch-sstmpl/1.4.0
+    $ $ES_HOME/bin/plugin --install org.codelibs/elasticsearch-sstmpl/1.4.1
 
 ## References
 
@@ -91,3 +91,9 @@ and then the search request is:
             "query_string": "search for these words"
         }
     }
+
+### Search Template Filter
+
+You can add your code before creating this search template in your Elasticsearch's plugin.
+To create the filter, it's created with SearchTemplateFilter and then is registered to SearchTemplateModule(call registerSearchTemplateFillter method).
+The sample code is [here](https://github.com/codelibs/elasticsearch-sstmpl/blob/master/src/test/java/org/codelibs/elasticsearch/sstmpl/filter/Test1Filter.java "Test1Filter").

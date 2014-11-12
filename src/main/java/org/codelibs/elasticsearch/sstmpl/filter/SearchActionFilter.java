@@ -10,6 +10,7 @@ import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.search.SearchAction;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.ActionFilter;
 import org.elasticsearch.action.support.ActionFilterChain;
 import org.elasticsearch.common.bytes.BytesReference;
@@ -22,13 +23,15 @@ import org.elasticsearch.script.ScriptService;
 import org.elasticsearch.script.ScriptService.ScriptType;
 
 public class SearchActionFilter extends AbstractComponent implements
-ActionFilter {
+        ActionFilter {
 
     private int order;
 
     private ScriptService scriptService;
 
     private SearchTemplateFilters filters;
+
+    private ThreadLocal<SearchType> currentSearchType = new ThreadLocal<>();
 
     @Inject
     public SearchActionFilter(final Settings settings,
@@ -57,24 +60,35 @@ ActionFilter {
         }
 
         SearchRequest searchRequest = (SearchRequest) request;
-        final BytesReference templateSource = searchRequest.templateSource();
-        if (templateSource != null) {
+        final SearchType searchType = currentSearchType.get();
+        if (searchType == null) {
             try {
-                final XContentParser parser = XContentFactory.xContent(
-                        templateSource).createParser(templateSource);
-                final Map<String, Object> sourceMap = parser.mapAndClose();
-                final Object langObj = sourceMap.get("lang");
-                if (langObj != null) {
-                    searchRequest = createScriptSearchRequest(searchRequest,
-                            langObj.toString(), sourceMap);
-                }
-            } catch (final Exception e) {
-                listener.onFailure(e);
-                return;
+                currentSearchType.set(searchRequest.searchType());
+                chain.proceed(action, request, listener);
+            } finally {
+                currentSearchType.remove();
             }
-        }
+        } else {
+            final BytesReference templateSource = searchRequest
+                    .templateSource();
+            if (templateSource != null) {
+                try {
+                    final XContentParser parser = XContentFactory.xContent(
+                            templateSource).createParser(templateSource);
+                    final Map<String, Object> sourceMap = parser.mapAndClose();
+                    final Object langObj = sourceMap.get("lang");
+                    if (langObj != null) {
+                        searchRequest = createScriptSearchRequest(
+                                searchRequest, langObj.toString(), sourceMap);
+                    }
+                } catch (final Exception e) {
+                    listener.onFailure(e);
+                    return;
+                }
+            }
 
-        chain.proceed(action, searchRequest, listener);
+            chain.proceed(action, searchRequest, listener);
+        }
     }
 
     private SearchRequest createScriptSearchRequest(
@@ -82,7 +96,7 @@ ActionFilter {
             final Map<String, Object> sourceMap) {
         @SuppressWarnings("unchecked")
         final Map<String, Object> paramMap = (Map<String, Object>) sourceMap
-        .get("params");
+                .get("params");
 
         String script;
         ScriptType scriptType;

@@ -37,7 +37,7 @@ public class ScriptTemplatePluginTest {
         final File scriptFile = new File(scriptDir, "search_query_2.groovy");
         Files.write(
                 "'{\"query\":{\"match\":{\"'+my_field+'\":\"'+my_value+'\"}},\"size\":\"'+my_size+'\"}'"
-                .getBytes(), scriptFile);
+                        .getBytes(), scriptFile);
 
         runner = new ElasticsearchClusterRunner();
         runner.onBuild(new ElasticsearchClusterRunner.Builder() {
@@ -49,7 +49,7 @@ public class ScriptTemplatePluginTest {
             }
         }).build(
                 newConfigs().numOfNode(1).ramIndexStore()
-                .basePath(esHomeDir.getAbsolutePath()));
+                        .basePath(esHomeDir.getAbsolutePath()));
         runner.ensureGreen();
     }
 
@@ -86,6 +86,21 @@ public class ScriptTemplatePluginTest {
         }
 
         String query;
+
+        query = "{\"template\":{\"query\":{\"match\":{\"{{my_field}}\":\"{{my_value}}\"}},\"size\":\"{{my_size}}\"},"
+                + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
+        try (CurlResponse curlResponse = Curl
+                .post(node, "/" + index + "/" + type + "/_search/template")
+                .param("search_type", "count").body(query).execute()) {
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+                    .get("hits");
+            assertThat(100, is(hitsMap.get("total")));
+            assertThat(
+                    0,
+                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
+        }
 
         query = "{\"query\":{\"match_all\":{}}}";
         try (CurlResponse curlResponse = Curl

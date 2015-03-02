@@ -32,7 +32,7 @@ public class ScriptTemplatePluginTest {
         esHomeDir = File.createTempFile("eshome", "");
         esHomeDir.delete();
 
-        final File scriptDir = new File(esHomeDir, "config/scripts");
+        final File scriptDir = new File(esHomeDir, "config/node_1/scripts");
         scriptDir.mkdirs();
         final File scriptFile = new File(scriptDir, "search_query_2.groovy");
         Files.write(
@@ -44,6 +44,7 @@ public class ScriptTemplatePluginTest {
             @Override
             public void build(final int number, final Builder settingsBuilder) {
                 settingsBuilder.put("http.cors.enabled", true);
+                settingsBuilder.put("script.groovy.sandbox.enabled", true);
                 settingsBuilder.put("plugin.types",
                         "org.codelibs.elasticsearch.sstmpl.TestPugin");
             }

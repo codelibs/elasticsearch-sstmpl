@@ -49,8 +49,8 @@ public class ScriptTemplatePluginTest {
                         "org.codelibs.elasticsearch.sstmpl.TestPugin");
             }
         }).build(
-                newConfigs().numOfNode(1).ramIndexStore()
-                        .basePath(esHomeDir.getAbsolutePath()));
+                newConfigs().clusterName("es-sstmpl").numOfNode(1)
+                        .ramIndexStore().basePath(esHomeDir.getAbsolutePath()));
         runner.ensureGreen();
     }
 

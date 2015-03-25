@@ -34,9 +34,14 @@ public class SearchTemplateChain {
         } else {
             final CompiledScript compiledScript = scriptService.compile(lang,
                     script, scriptType);
+            final Map<String, Object> vars;
+            if (paramMap != null) {
+                vars = paramMap;
+            } else {
+                vars = Collections.emptyMap();
+            }
             final ExecutableScript executable = scriptService.executable(
-                    compiledScript,
-                    paramMap != null ? paramMap : Collections.emptyMap());
+                    compiledScript, vars);
             final Object result = executable.run();
             if (result instanceof String) {
                 return (String) result;

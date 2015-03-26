@@ -21,25 +21,30 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.script.ScriptService;
 import org.elasticsearch.script.ScriptService.ScriptType;
+import org.elasticsearch.threadpool.ThreadPool;
+import org.elasticsearch.threadpool.ThreadPool.Names;
 
 public class SearchActionFilter extends AbstractComponent implements
         ActionFilter {
 
     private int order;
 
-    private ScriptService scriptService;
+    private final ScriptService scriptService;
 
-    private SearchTemplateFilters filters;
+    private final SearchTemplateFilters filters;
+
+    private final ThreadPool threadPool;
 
     private ThreadLocal<SearchType> currentSearchType = new ThreadLocal<>();
 
     @Inject
     public SearchActionFilter(final Settings settings,
             final ScriptService scriptService,
-            final SearchTemplateFilters filters) {
+            final SearchTemplateFilters filters, final ThreadPool threadPool) {
         super(settings);
         this.scriptService = scriptService;
         this.filters = filters;
+        this.threadPool = threadPool;
 
         order = settings.getAsInt("indices.sstmpl.filter.order", 1);
     }
@@ -59,7 +64,7 @@ public class SearchActionFilter extends AbstractComponent implements
             return;
         }
 
-        SearchRequest searchRequest = (SearchRequest) request;
+        final SearchRequest searchRequest = (SearchRequest) request;
         final SearchType searchType = currentSearchType.get();
         if (searchType == null) {
             try {
@@ -69,25 +74,37 @@ public class SearchActionFilter extends AbstractComponent implements
                 currentSearchType.remove();
             }
         } else {
-            final BytesReference templateSource = searchRequest
-                    .templateSource();
-            if (templateSource != null) {
-                try {
-                    final XContentParser parser = XContentFactory.xContent(
-                            templateSource).createParser(templateSource);
-                    final Map<String, Object> sourceMap = parser.mapAndClose();
-                    final Object langObj = sourceMap.get("lang");
-                    if (langObj != null) {
-                        searchRequest = createScriptSearchRequest(
-                                searchRequest, langObj.toString(), sourceMap);
+            threadPool.executor(Names.SEARCH).execute(new Runnable() {
+                @Override
+                public void run() {
+                    final BytesReference templateSource = searchRequest
+                            .templateSource();
+                    if (templateSource != null) {
+                        try {
+                            final XContentParser parser = XContentFactory
+                                    .xContent(templateSource).createParser(
+                                            templateSource);
+                            final Map<String, Object> sourceMap = parser
+                                    .mapAndClose();
+                            final Object langObj = sourceMap.get("lang");
+                            if (langObj != null) {
+                                chain.proceed(
+                                        action,
+                                        createScriptSearchRequest(
+                                                searchRequest,
+                                                langObj.toString(), sourceMap),
+                                        listener);
+                            } else {
+                                chain.proceed(action, searchRequest, listener);
+                            }
+                        } catch (final Exception e) {
+                            listener.onFailure(e);
+                        }
+                    } else {
+                        chain.proceed(action, searchRequest, listener);
                     }
-                } catch (final Exception e) {
-                    listener.onFailure(e);
-                    return;
                 }
-            }
-
-            chain.proceed(action, searchRequest, listener);
+            });
         }
     }
 

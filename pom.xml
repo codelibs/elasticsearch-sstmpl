@@ -26,9 +26,18 @@
 		<version>9</version>
 	</parent>
 	<properties>
-		<elasticsearch.version>1.5.0</elasticsearch.version>
+		<elasticsearch.version>1.5.2</elasticsearch.version>
 	</properties>
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -89,7 +98,7 @@
 		<dependency>
 			<groupId>org.codelibs</groupId>
 			<artifactId>elasticsearch-cluster-runner</artifactId>
-			<version>1.5.0.0</version>
+			<version>1.5.0.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

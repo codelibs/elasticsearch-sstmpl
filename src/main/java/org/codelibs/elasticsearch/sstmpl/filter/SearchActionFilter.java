@@ -114,6 +114,7 @@ public class SearchActionFilter extends AbstractComponent implements
         @SuppressWarnings("unchecked")
         final Map<String, Object> paramMap = (Map<String, Object>) sourceMap
                 .get("params");
+        paramMap.put("request", searchRequest);
 
         String script;
         ScriptType scriptType;

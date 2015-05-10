@@ -1,6 +1,7 @@
 package org.codelibs.elasticsearch.sstmpl.filter;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.codelibs.elasticsearch.sstmpl.ScriptTemplateException;
@@ -26,6 +27,10 @@ import org.elasticsearch.threadpool.ThreadPool.Names;
 
 public class SearchActionFilter extends AbstractComponent implements
         ActionFilter {
+
+    private static final String PARAMS = "params";
+
+    private static final String REQUEST = "request";
 
     private int order;
 
@@ -112,9 +117,11 @@ public class SearchActionFilter extends AbstractComponent implements
             final SearchRequest searchRequest, final String lang,
             final Map<String, Object> sourceMap) {
         @SuppressWarnings("unchecked")
-        final Map<String, Object> paramMap = (Map<String, Object>) sourceMap
-                .get("params");
-        paramMap.put("request", searchRequest);
+        final Map<String, Object> paramMap = sourceMap.containsKey(PARAMS) ? (Map<String, Object>) sourceMap
+                .get(PARAMS) : new HashMap<String, Object>();
+        if (!paramMap.containsKey(REQUEST)) {
+            paramMap.put(REQUEST, searchRequest);
+        }
 
         String script;
         ScriptType scriptType;

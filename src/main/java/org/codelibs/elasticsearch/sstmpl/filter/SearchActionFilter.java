@@ -84,7 +84,7 @@ public class SearchActionFilter extends AbstractComponent implements
                 public void run() {
                     final BytesReference templateSource = searchRequest
                             .templateSource();
-                    if (templateSource != null) {
+                    if (templateSource != null && templateSource.length() > 0) {
                         try {
                             final XContentParser parser = XContentFactory
                                     .xContent(templateSource).createParser(

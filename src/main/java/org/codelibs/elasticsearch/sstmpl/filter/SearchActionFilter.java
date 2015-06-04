@@ -11,7 +11,6 @@ import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionResponse;
 import org.elasticsearch.action.search.SearchAction;
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.ActionFilter;
 import org.elasticsearch.action.support.ActionFilterChain;
 import org.elasticsearch.common.bytes.BytesReference;
@@ -25,8 +24,10 @@ import org.elasticsearch.script.ScriptService.ScriptType;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.threadpool.ThreadPool.Names;
 
-public class SearchActionFilter extends AbstractComponent implements
-        ActionFilter {
+public class SearchActionFilter extends AbstractComponent
+        implements ActionFilter {
+
+    private static final String SEARCH_REQUEST_INVOKED = "filter.codelibs.sstmpl.Invoked";
 
     private static final String PARAMS = "params";
 
@@ -39,8 +40,6 @@ public class SearchActionFilter extends AbstractComponent implements
     private final SearchTemplateFilters filters;
 
     private final ThreadPool threadPool;
-
-    private ThreadLocal<SearchType> currentSearchType = new ThreadLocal<>();
 
     @Inject
     public SearchActionFilter(final Settings settings,
@@ -70,15 +69,8 @@ public class SearchActionFilter extends AbstractComponent implements
         }
 
         final SearchRequest searchRequest = (SearchRequest) request;
-        final SearchType searchType = currentSearchType.get();
-        if (searchType == null) {
-            try {
-                currentSearchType.set(searchRequest.searchType());
-                chain.proceed(action, request, listener);
-            } finally {
-                currentSearchType.remove();
-            }
-        } else {
+        final Boolean invoked = searchRequest.getHeader(SEARCH_REQUEST_INVOKED);
+        if (invoked != null && invoked.booleanValue()) {
             threadPool.executor(Names.SEARCH).execute(new Runnable() {
                 @Override
                 public void run() {
@@ -87,16 +79,14 @@ public class SearchActionFilter extends AbstractComponent implements
                     if (templateSource != null && templateSource.length() > 0) {
                         try {
                             final XContentParser parser = XContentFactory
-                                    .xContent(templateSource).createParser(
-                                            templateSource);
+                                    .xContent(templateSource)
+                                    .createParser(templateSource);
                             final Map<String, Object> sourceMap = parser
                                     .mapAndClose();
                             final Object langObj = sourceMap.get("lang");
                             if (langObj != null) {
-                                chain.proceed(
-                                        action,
-                                        createScriptSearchRequest(
-                                                searchRequest,
+                                chain.proceed(action,
+                                        createScriptSearchRequest(searchRequest,
                                                 langObj.toString(), sourceMap),
                                         listener);
                             } else {
@@ -110,6 +100,9 @@ public class SearchActionFilter extends AbstractComponent implements
                     }
                 }
             });
+        } else {
+            searchRequest.putHeader(SEARCH_REQUEST_INVOKED, Boolean.TRUE);
+            chain.proceed(action, request, listener);
         }
     }
 
@@ -117,8 +110,9 @@ public class SearchActionFilter extends AbstractComponent implements
             final SearchRequest searchRequest, final String lang,
             final Map<String, Object> sourceMap) {
         @SuppressWarnings("unchecked")
-        final Map<String, Object> paramMap = sourceMap.containsKey(PARAMS) ? (Map<String, Object>) sourceMap
-                .get(PARAMS) : new HashMap<String, Object>();
+        final Map<String, Object> paramMap = sourceMap.containsKey(PARAMS)
+                ? (Map<String, Object>) sourceMap.get(PARAMS)
+                : new HashMap<String, Object>();
         if (!paramMap.containsKey(REQUEST)) {
             paramMap.put(REQUEST, searchRequest);
         }
@@ -159,8 +153,9 @@ public class SearchActionFilter extends AbstractComponent implements
             throw new ScriptTemplateException("template is not an object.");
         }
 
-        searchRequest.source(new SearchTemplateChain(scriptService, filters
-                .filters()).doCreate(lang, script, scriptType, paramMap));
+        searchRequest.source(
+                new SearchTemplateChain(scriptService, filters.filters())
+                        .doCreate(lang, script, scriptType, paramMap));
         searchRequest.templateName(null);
         searchRequest.templateSource(null, false);
         searchRequest.templateType(null);

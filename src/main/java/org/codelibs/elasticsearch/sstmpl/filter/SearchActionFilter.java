@@ -13,6 +13,7 @@ import org.elasticsearch.action.search.SearchAction;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.support.ActionFilter;
 import org.elasticsearch.action.support.ActionFilterChain;
+import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.component.AbstractComponent;
 import org.elasticsearch.common.inject.Inject;
@@ -157,7 +158,7 @@ public class SearchActionFilter extends AbstractComponent
                 new SearchTemplateChain(scriptService, filters.filters())
                         .doCreate(lang, script, scriptType, paramMap));
         searchRequest.templateName(null);
-        searchRequest.templateSource(null, false);
+        searchRequest.templateSource(BytesArray.EMPTY);
         searchRequest.templateType(null);
 
         return searchRequest;

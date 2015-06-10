@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.codelibs.elasticsearch.runner.ElasticsearchClusterRunner;
 import org.codelibs.elasticsearch.runner.net.Curl;
@@ -49,7 +50,7 @@ public class ScriptTemplatePluginTest {
                         "org.codelibs.elasticsearch.sstmpl.TestPugin");
             }
         }).build(
-                newConfigs().clusterName("es-sstmpl").numOfNode(1)
+                newConfigs().clusterName(UUID.randomUUID().toString()).numOfNode(1)
                         .ramIndexStore().basePath(esHomeDir.getAbsolutePath()));
         runner.ensureGreen();
     }

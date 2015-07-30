@@ -13,7 +13,8 @@ Therefore, you can use any script you want in Search Template.
 
 | Version   | Elasticsearch |
 |:---------:|:-------------:|
-| master    | 1.5.X         |
+| master    | 1.6.X         |
+| 1.6.0     | 1.6.0         |
 | 1.5.2     | 1.5.2         |
 | 1.4.2     | 1.4.0         |
 
@@ -26,7 +27,7 @@ Please file an [issue](https://github.com/codelibs/elasticsearch-sstmpl/issues "
 
 ### Install Script-based Search Template Plugin
 
-    $ $ES_HOME/bin/plugin --install org.codelibs/elasticsearch-sstmpl/1.5.2
+    $ $ES_HOME/bin/plugin --install org.codelibs/elasticsearch-sstmpl/1.6.0
 
 ## References
 

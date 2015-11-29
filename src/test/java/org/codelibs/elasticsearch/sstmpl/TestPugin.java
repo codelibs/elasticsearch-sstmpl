@@ -4,9 +4,9 @@ import org.codelibs.elasticsearch.sstmpl.filter.Test1Filter;
 import org.codelibs.elasticsearch.sstmpl.filter.Test2Filter;
 import org.codelibs.elasticsearch.sstmpl.filter.Test3Filter;
 import org.codelibs.elasticsearch.sstmpl.module.SearchTemplateModule;
-import org.elasticsearch.plugins.AbstractPlugin;
+import org.elasticsearch.plugins.Plugin;
 
-public class TestPugin extends AbstractPlugin {
+public class TestPugin extends Plugin {
 
     @Override
     public String name() {

@@ -78,12 +78,11 @@ public class SearchActionFilter extends AbstractComponent
                     final BytesReference templateSource = searchRequest
                             .templateSource();
                     if (templateSource != null && templateSource.length() > 0) {
-                        try {
-                            final XContentParser parser = XContentFactory
-                                    .xContent(templateSource)
-                                    .createParser(templateSource);
+                        try (final XContentParser parser = XContentFactory
+                                .xContent(templateSource)
+                                .createParser(templateSource)) {
                             final Map<String, Object> sourceMap = parser
-                                    .mapAndClose();
+                                    .map();
                             final Object langObj = sourceMap.get("lang");
                             if (langObj != null) {
                                 chain.proceed(action,
@@ -157,9 +156,8 @@ public class SearchActionFilter extends AbstractComponent
         searchRequest.source(
                 new SearchTemplateChain(scriptService, filters.filters())
                         .doCreate(lang, script, scriptType, paramMap));
-        searchRequest.templateName(null);
+        searchRequest.template(null);
         searchRequest.templateSource(BytesArray.EMPTY);
-        searchRequest.templateType(null);
 
         return searchRequest;
     }

@@ -1,13 +1,13 @@
 package org.codelibs.elasticsearch.sstmpl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.codelibs.elasticsearch.sstmpl.filter.SearchActionFilter;
 import org.codelibs.elasticsearch.sstmpl.module.SearchTemplateModule;
 import org.elasticsearch.action.ActionModule;
-import org.elasticsearch.common.collect.Lists;
 import org.elasticsearch.common.inject.Module;
-import org.elasticsearch.plugins.AbstractPlugin;
+import org.elasticsearch.plugins.Plugin;
 
 /**
  * Script-based Search Template Plugin.
@@ -15,11 +15,11 @@ import org.elasticsearch.plugins.AbstractPlugin;
  * @author shinsuke
  *
  */
-public class ScriptTemplatePlugin extends AbstractPlugin {
+public class ScriptTemplatePlugin extends Plugin {
 
     @Override
     public String name() {
-        return "ScriptTemplatePlugin";
+        return "sstmpl";
     }
 
     @Override
@@ -32,10 +32,9 @@ public class ScriptTemplatePlugin extends AbstractPlugin {
     }
 
     @Override
-    public Collection<Class<? extends Module>> modules() {
-        final Collection<Class<? extends Module>> modules = Lists
-                .newArrayList();
-        modules.add(SearchTemplateModule.class);
+    public Collection<Module> nodeModules() {
+        final Collection<Module> modules = new ArrayList<>();
+        modules.add(new SearchTemplateModule());
         return modules;
     }
 }

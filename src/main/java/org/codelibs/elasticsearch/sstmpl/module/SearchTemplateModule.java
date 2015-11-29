@@ -1,16 +1,15 @@
 package org.codelibs.elasticsearch.sstmpl.module;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.codelibs.elasticsearch.sstmpl.filter.SearchTemplateFilter;
 import org.codelibs.elasticsearch.sstmpl.filter.SearchTemplateFilters;
-import org.elasticsearch.common.collect.Lists;
 import org.elasticsearch.common.inject.AbstractModule;
 import org.elasticsearch.common.inject.multibindings.Multibinder;
 
 public class SearchTemplateModule extends AbstractModule {
-    private final List<Class<? extends SearchTemplateFilter>> searchTemplateFilters = Lists
-            .newArrayList();
+    private final List<Class<? extends SearchTemplateFilter>> searchTemplateFilters = new ArrayList<>();
 
     @Override
     protected void configure() {

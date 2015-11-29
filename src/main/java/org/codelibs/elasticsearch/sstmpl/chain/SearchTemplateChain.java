@@ -1,6 +1,7 @@
 package org.codelibs.elasticsearch.sstmpl.chain;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.codelibs.elasticsearch.sstmpl.ScriptTemplateException;
@@ -8,8 +9,11 @@ import org.codelibs.elasticsearch.sstmpl.filter.SearchTemplateFilter;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.script.CompiledScript;
 import org.elasticsearch.script.ExecutableScript;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptContext;
 import org.elasticsearch.script.ScriptService;
 import org.elasticsearch.script.ScriptService.ScriptType;
+import org.elasticsearch.search.internal.SearchContext;
 
 public class SearchTemplateChain {
 
@@ -32,8 +36,10 @@ public class SearchTemplateChain {
             position++;
             return filter.doCreate(lang, script, scriptType, paramMap, this);
         } else {
-            final CompiledScript compiledScript = scriptService.compile(lang,
-                    script, scriptType);
+            final CompiledScript compiledScript = scriptService.compile(
+                    new Script(script, scriptType, lang,
+                            new HashMap<String, Object>()),
+                    ScriptContext.Standard.SEARCH, SearchContext.current());
             final Map<String, Object> vars;
             if (paramMap != null) {
                 vars = paramMap;

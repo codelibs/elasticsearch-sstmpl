@@ -3,8 +3,8 @@ package org.codelibs.elasticsearch.sstmpl.chain;
 import java.util.Collections;
 import java.util.Map;
 
-import org.codelibs.elasticsearch.sstmpl.ScriptTemplateException;
 import org.codelibs.elasticsearch.sstmpl.filter.SearchTemplateFilter;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.script.CompiledScript;
 import org.elasticsearch.script.ExecutableScript;
@@ -48,7 +48,7 @@ public class SearchTemplateChain {
             } else if (result instanceof BytesReference) {
                 return ((BytesReference) result).toUtf8();
             } else {
-                throw new ScriptTemplateException("Query DSL is null.");
+                throw new ElasticsearchException("Query DSL is null.");
             }
         }
     }

@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codelibs.elasticsearch.sstmpl.ScriptTemplateException;
 import org.codelibs.elasticsearch.sstmpl.chain.SearchTemplateChain;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionResponse;
@@ -142,7 +142,7 @@ public class SearchActionFilter extends AbstractComponent
                     script = XContentFactory.jsonBuilder().value(templateMap)
                             .string();
                 } catch (final IOException e) {
-                    throw new ScriptTemplateException(
+                    throw new ElasticsearchException(
                             "Failed to parse template object: " + templateObj);
                 }
             }
@@ -151,7 +151,7 @@ public class SearchActionFilter extends AbstractComponent
             scriptType = ScriptType.INLINE;
             script = templateObj.toString();
         } else {
-            throw new ScriptTemplateException("template is not an object.");
+            throw new ElasticsearchException("template is not an object.");
         }
 
         searchRequest.source(

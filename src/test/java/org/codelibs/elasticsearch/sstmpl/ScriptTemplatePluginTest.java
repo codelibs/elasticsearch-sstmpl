@@ -57,7 +57,9 @@ public class ScriptTemplatePluginTest {
                 settingsBuilder.put("index.number_of_replicas", 0);
                 settingsBuilder.putArray("discovery.zen.ping.unicast.hosts", "localhost:9301-9310");
                 settingsBuilder.put("plugin.types",
-                        "org.codelibs.elasticsearch.sstmpl.ScriptTemplatePlugin,org.codelibs.elasticsearch.sstmpl.TestPugin");
+                        "org.elasticsearch.script.groovy.GroovyPlugin"
+                                + ",org.codelibs.elasticsearch.sstmpl.ScriptTemplatePlugin"
+                                + ",org.codelibs.elasticsearch.sstmpl.TestPugin");
                 settingsBuilder.put("index.unassigned.node_left.delayed_timeout", "0");
             }
         }).build(

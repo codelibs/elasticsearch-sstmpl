@@ -39,7 +39,8 @@ public class SearchTemplateChain {
             final CompiledScript compiledScript = scriptService.compile(
                     new Script(script, scriptType, lang,
                             new HashMap<String, Object>()),
-                    ScriptContext.Standard.SEARCH, SearchContext.current());
+                    ScriptContext.Standard.SEARCH, SearchContext.current(),
+                    Collections.<String, String> emptyMap());
             final Map<String, Object> vars;
             if (paramMap != null) {
                 vars = paramMap;

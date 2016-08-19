@@ -102,6 +102,169 @@ public class ScriptTemplatePluginTest {
 
         String query;
 
+        query = "{\"inline\":{\"query\":{\"match\":{\"{{my_field}}\":\"{{my_value}}\"}},\"size\":\"{{my_size}}\"},"
+                + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
+        try (CurlResponse curlResponse = Curl
+                .post(node, "/" + index + "/" + type + "/_search/template")
+                .param("search_type", "count").body(query).execute()) {
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+                    .get("hits");
+            assertThat(100, is(hitsMap.get("total")));
+            assertThat(
+                    0,
+                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
+        }
+
+        query = "{\"query\":{\"match_all\":{}}}";
+        try (CurlResponse curlResponse = Curl
+                .post(node, "/" + index + "/" + type + "/_search").body(query)
+                .execute()) {
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+                    .get("hits");
+            assertThat(1000, is(hitsMap.get("total")));
+            assertThat(
+                    10,
+                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
+        }
+
+        query = "{\"inline\":{\"query\":{\"match\":{\"{{my_field}}\":\"{{my_value}}\"}},\"size\":\"{{my_size}}\"},"
+                + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
+        try (CurlResponse curlResponse = Curl
+                .post(node, "/" + index + "/" + type + "/_search/template")
+                .body(query).execute()) {
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+                    .get("hits");
+            assertThat(100, is(hitsMap.get("total")));
+            assertThat(
+                    50,
+                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
+        }
+
+        query = "{\"lang\":\"mustache\",\"inline\":{\"query\":{\"match\":{\"{{my_field}}\":\"{{my_value}}\"}},\"size\":\"{{my_size}}\"},"
+                + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
+        try (CurlResponse curlResponse = Curl
+                .post(node, "/" + index + "/" + type + "/_search/template")
+                .body(query).execute()) {
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+                    .get("hits");
+            assertThat(100, is(hitsMap.get("total")));
+            assertThat(
+                    50,
+                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
+        }
+
+        query = "{\"lang\":\"groovy\",\"inline\":\"'{\\\"query\\\":{\\\"match\\\":{\\\"'+my_field+'\\\":\\\"'+my_value+'\\\"}},\\\"size\\\":\\\"'+my_size+'\\\"}'\","
+                + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
+        try (CurlResponse curlResponse = Curl
+                .post(node, "/" + index + "/" + type + "/_search/template")
+                .body(query).execute()) {
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+                    .get("hits");
+            assertThat(100, is(hitsMap.get("total")));
+            assertThat(
+                    50,
+                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
+        }
+
+        query = "{\"lang\":\"groovy\",\"id\":\"search_query_1\","
+                + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
+        try (CurlResponse curlResponse = Curl
+                .post(node, "/" + index + "/" + type + "/_search/template")
+                .body(query).execute()) {
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+                    .get("hits");
+            assertThat(100, is(hitsMap.get("total")));
+            assertThat(
+                    50,
+                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
+        }
+
+        query = "{\"lang\":\"groovy\",\"file\":\"search_query_2\","
+                + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
+        try (CurlResponse curlResponse = Curl
+                .post(node, "/" + index + "/" + type + "/_search/template")
+                .body(query).execute()) {
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+                    .get("hits");
+            assertThat(100, is(hitsMap.get("total")));
+            assertThat(
+                    50,
+                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
+        }
+
+        query = "{\"lang\":\"groovy\",\"inline\":\"'{\\\"query\\\":{\\\"match\\\":{\\\"'+my_field+'\\\":\\\"'+my_value+'\\\"}},\\\"size\\\":\\\"'+my_size+'\\\"}'\","
+                + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
+        try (CurlResponse curlResponse = Curl
+                .post(node, "/" + index + "/" + type + "/_search/template")
+                .body(query).execute()) {
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+                    .get("hits");
+            assertThat(100, is(hitsMap.get("total")));
+            assertThat(
+                    50,
+                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
+        }
+
+        query = "{\"lang\":\"groovy\",\"inline\":\"'{\\\"query\\\":{\\\"match\\\":{\\\"'+my_field+'\\\":\\\"'+my_value+'\\\"}},\\\"size\\\":\\\"'+my_size+'\\\"}'\","
+                + "\"params\":{\"my_fieldx\":\"category\",\"my_valuex\":\"1\",\"my_sizex\":\"50\"}}";
+        try (CurlResponse curlResponse = Curl
+                .post(node, "/" + index + "/" + type + "/_search/template")
+                .body(query).execute()) {
+            final Map<String, Object> contentMap = curlResponse
+                    .getContentAsMap();
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+                    .get("hits");
+            assertThat(100, is(hitsMap.get("total")));
+            assertThat(
+                    50,
+                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
+        }
+    }
+
+    @Test
+    public void test_old_search() throws Exception {
+
+        assertThat(1, is(runner.getNodeSize()));
+
+        final Node node = runner.node();
+
+        final String index = "sample";
+        final String type = "data";
+        runner.createIndex(index, Settings.builder().build());
+
+        for (int i = 1; i <= 1000; i++) {
+            final IndexResponse indexResponse = runner.insert(index, type,
+                    String.valueOf(i), "{\"id\":\"" + i + "\",\"msg\":\"test "
+                            + i + "\",\"counter\":" + i + ",\"category\":" + i
+                            % 10 + "}");
+            assertTrue(indexResponse.isCreated());
+        }
+
+        try (CurlResponse curlResponse = Curl
+                .post(node, "/_scripts/groovy/search_query_1")
+                .body("{\"script\":\"'{\\\"query\\\":{\\\"match\\\":{\\\"'+my_field+'\\\":\\\"'+my_value+'\\\"}},\\\"size\\\":\\\"'+my_size+'\\\"}'\"}")
+                .execute()) {
+            assertThat(201, is(curlResponse.getHttpStatusCode()));
+        }
+
+        String query;
+
         query = "{\"template\":{\"query\":{\"match\":{\"{{my_field}}\":\"{{my_value}}\"}},\"size\":\"{{my_size}}\"},"
                 + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
         try (CurlResponse curlResponse = Curl

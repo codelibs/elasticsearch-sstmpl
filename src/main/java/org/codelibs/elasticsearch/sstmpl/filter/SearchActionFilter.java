@@ -15,6 +15,7 @@ import org.elasticsearch.action.support.ActionFilter;
 import org.elasticsearch.action.support.ActionFilterChain;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
+import org.elasticsearch.common.collect.Tuple;
 import org.elasticsearch.common.component.AbstractComponent;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
@@ -110,8 +111,44 @@ public class SearchActionFilter extends AbstractComponent
             paramMap.put(REQUEST, searchRequest);
         }
 
-        String script;
-        ScriptType scriptType;
+        final Tuple<ScriptType, String> tuple = parseScript(sourceMap);
+        final String script = tuple.v2();
+        final ScriptType scriptType = tuple.v1();
+        searchRequest.source(new SearchTemplateChain(scriptService, filters.filters()).doCreate(lang, script, scriptType, paramMap));
+        searchRequest.template(null);
+        searchRequest.templateSource(BytesArray.EMPTY);
+
+        return searchRequest;
+    }
+
+    private Tuple<ScriptType, String> parseScript(Map<String, Object> sourceMap) {
+        final Object inlineObj = sourceMap.get("inline");
+        if (inlineObj instanceof Map) {
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> inlineMap = (Map<String, Object>) inlineObj;
+            // query
+            try {
+                return new Tuple<>(ScriptType.INLINE, XContentFactory.jsonBuilder().value(inlineMap).string());
+            } catch (final IOException e) {
+                throw new ScriptTemplateException("Failed to parse inline object: " + inlineObj);
+            }
+        } else if (inlineObj instanceof String) {
+            // query
+            return new Tuple<>(ScriptType.INLINE, inlineObj.toString());
+        }
+
+        final Object fileObj = sourceMap.get("file");
+        if (fileObj instanceof String) {
+            // file
+            return new Tuple<>(ScriptType.FILE, fileObj.toString());
+        }
+
+        final Object idObj = sourceMap.get("id");
+        if (idObj instanceof String) {
+            // id
+            return new Tuple<>(ScriptType.INDEXED, idObj.toString());
+        }
+
         final Object templateObj = sourceMap.get("template");
         if (templateObj instanceof Map) {
             @SuppressWarnings("unchecked")
@@ -121,38 +158,24 @@ public class SearchActionFilter extends AbstractComponent
             final String templateFile = (String) templateMap.get("file");
             if (templateName != null) {
                 // id
-                scriptType = ScriptType.INDEXED;
-                script = templateName;
+                return new Tuple<>(ScriptType.INDEXED, templateName);
             } else if (templateFile != null) {
                 // file
-                scriptType = ScriptType.FILE;
-                script = templateFile;
+                return new Tuple<>(ScriptType.FILE, templateFile);
             } else {
-                // query/filtered
-                scriptType = ScriptType.INLINE;
+                // query
                 try {
-                    script = XContentFactory.jsonBuilder().value(templateMap)
-                            .string();
+                    return new Tuple<>(ScriptType.INLINE, XContentFactory.jsonBuilder().value(templateMap).string());
                 } catch (final IOException e) {
-                    throw new ScriptTemplateException(
-                            "Failed to parse template object: " + templateObj);
+                    throw new ScriptTemplateException("Failed to parse template object: " + templateObj);
                 }
             }
         } else if (templateObj instanceof String) {
-            // query/filtered
-            scriptType = ScriptType.INLINE;
-            script = templateObj.toString();
+            // query
+            return new Tuple<>(ScriptType.INLINE, templateObj.toString());
         } else {
             throw new ScriptTemplateException("template is not an object.");
         }
-
-        searchRequest.source(
-                new SearchTemplateChain(scriptService, filters.filters())
-                        .doCreate(lang, script, scriptType, paramMap));
-        searchRequest.template(null);
-        searchRequest.templateSource(BytesArray.EMPTY);
-
-        return searchRequest;
     }
 
     @Override

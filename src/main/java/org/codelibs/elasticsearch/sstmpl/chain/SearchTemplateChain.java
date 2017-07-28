@@ -12,8 +12,7 @@ import org.elasticsearch.script.ExecutableScript;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptContext;
 import org.elasticsearch.script.ScriptService;
-import org.elasticsearch.script.ScriptService.ScriptType;
-import org.elasticsearch.search.internal.SearchContext;
+import org.elasticsearch.script.ScriptType;
 
 public class SearchTemplateChain {
 
@@ -36,11 +35,8 @@ public class SearchTemplateChain {
             position++;
             return filter.doCreate(lang, script, scriptType, paramMap, this);
         } else {
-            final CompiledScript compiledScript = scriptService.compile(
-                    new Script(script, scriptType, lang,
-                            new HashMap<String, Object>()),
-                    ScriptContext.Standard.SEARCH, SearchContext.current(),
-                    Collections.<String, String> emptyMap());
+            final CompiledScript compiledScript = scriptService.compile(new Script(scriptType, lang, script, new HashMap<String, Object>()),
+                    ScriptContext.Standard.SEARCH);
             final Map<String, Object> vars;
             if (paramMap != null) {
                 vars = paramMap;
@@ -53,7 +49,7 @@ public class SearchTemplateChain {
             if (result instanceof String) {
                 return (String) result;
             } else if (result instanceof BytesReference) {
-                return ((BytesReference) result).toUtf8();
+                return ((BytesReference) result).utf8ToString();
             } else {
                 throw new ScriptTemplateException("Query DSL is null.");
             }

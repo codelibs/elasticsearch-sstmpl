@@ -3,7 +3,7 @@ package org.codelibs.elasticsearch.sstmpl.filter;
 import java.util.Map;
 
 import org.codelibs.elasticsearch.sstmpl.chain.SearchTemplateChain;
-import org.elasticsearch.script.ScriptService.ScriptType;
+import org.elasticsearch.script.ScriptType;
 
 public interface SearchTemplateFilter {
 

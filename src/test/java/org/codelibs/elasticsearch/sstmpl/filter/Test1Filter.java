@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.codelibs.elasticsearch.sstmpl.chain.SearchTemplateChain;
 import org.elasticsearch.common.collect.MapBuilder;
-import org.elasticsearch.script.ScriptService.ScriptType;
+import org.elasticsearch.script.ScriptType;
 
 public class Test1Filter implements SearchTemplateFilter {
 

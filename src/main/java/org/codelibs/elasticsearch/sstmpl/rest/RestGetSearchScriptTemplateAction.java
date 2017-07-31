@@ -35,7 +35,6 @@ import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.RestResponse;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.rest.action.RestBuilderListener;
-import org.elasticsearch.script.Script;
 import org.elasticsearch.script.StoredScriptSource;
 
 public class RestGetSearchScriptTemplateAction extends BaseRestHandler {
@@ -47,14 +46,15 @@ public class RestGetSearchScriptTemplateAction extends BaseRestHandler {
     public RestGetSearchScriptTemplateAction(Settings settings, RestController controller) {
         super(settings);
 
-        controller.registerHandler(GET, "/_search/script_template/{id}", this);
+        controller.registerHandler(GET, "/_search/script_template/{lang}/{id}", this);
     }
 
     @Override
     public RestChannelConsumer prepareRequest(final RestRequest request, NodeClient client) throws IOException {
         String id = request.param("id");
+        String lang = request.param("lang");
 
-        GetStoredScriptRequest getRequest = new GetStoredScriptRequest(id, Script.DEFAULT_TEMPLATE_LANG);
+        GetStoredScriptRequest getRequest = new GetStoredScriptRequest(id, lang);
 
         return channel -> client.admin().cluster().getStoredScript(getRequest, new RestBuilderListener<GetStoredScriptResponse>(channel) {
             @Override
@@ -62,7 +62,7 @@ public class RestGetSearchScriptTemplateAction extends BaseRestHandler {
                 builder.startObject();
                 builder.field(_ID_PARSE_FIELD.getPreferredName(), id);
 
-                builder.field(StoredScriptSource.LANG_PARSE_FIELD.getPreferredName(), Script.DEFAULT_TEMPLATE_LANG);
+                builder.field(StoredScriptSource.LANG_PARSE_FIELD.getPreferredName(), lang);
 
                 StoredScriptSource source = response.getSource();
                 boolean found = source != null;

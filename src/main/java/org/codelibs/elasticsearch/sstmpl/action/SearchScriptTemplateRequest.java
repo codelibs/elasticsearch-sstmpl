@@ -43,6 +43,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
     private boolean profile = false;
     private ScriptType scriptType;
     private String script;
+    private String scriptLang = "mustache";
     private Map<String, Object> scriptParams;
 
     public SearchScriptTemplateRequest() {
@@ -101,6 +102,14 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         this.script = script;
     }
 
+    public String getScriptLang() {
+        return scriptLang;
+    }
+
+    public void setScriptLang(String scriptLang) {
+        this.scriptLang = scriptLang;
+    }
+
     public Map<String, Object> getScriptParams() {
         return scriptParams;
     }
@@ -114,6 +123,9 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         ActionRequestValidationException validationException = null;
         if (script == null || script.isEmpty()) {
             validationException = addValidationError("template is missing", validationException);
+        }
+        if (scriptLang == null || scriptLang.isEmpty()) {
+            validationException = addValidationError("lang is missing", validationException);
         }
         if (scriptType == null) {
             validationException = addValidationError("template's script type is missing", validationException);
@@ -143,6 +155,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         profile = in.readBoolean();
         scriptType = ScriptType.readFrom(in);
         script = in.readOptionalString();
+        scriptLang = in.readOptionalString();
         if (in.readBoolean()) {
             scriptParams = in.readMap();
         }
@@ -157,6 +170,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         out.writeBoolean(profile);
         scriptType.writeTo(out);
         out.writeOptionalString(script);
+        out.writeOptionalString(scriptLang);
         boolean hasParams = scriptParams != null;
         out.writeBoolean(hasParams);
         if (hasParams) {

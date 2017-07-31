@@ -31,23 +31,23 @@ import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.action.AcknowledgedRestListener;
-import org.elasticsearch.script.Script;
 
 public class RestPutSearchScriptTemplateAction extends BaseRestHandler {
 
     public RestPutSearchScriptTemplateAction(Settings settings, RestController controller) {
         super(settings);
 
-        controller.registerHandler(POST, "/_search/script_template/{id}", this);
-        controller.registerHandler(PUT, "/_search/script_template/{id}", this);
+        controller.registerHandler(POST, "/_search/script_template/{lang}/{id}", this);
+        controller.registerHandler(PUT, "/_search/script_template/{lang}/{id}", this);
     }
 
     @Override
     public RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) throws IOException {
         String id = request.param("id");
+        String lang = request.param("lang");
         BytesReference content = request.requiredContent();
 
-        PutStoredScriptRequest put = new PutStoredScriptRequest(id, Script.DEFAULT_TEMPLATE_LANG, content, request.getXContentType());
+        PutStoredScriptRequest put = new PutStoredScriptRequest(id, lang, content, request.getXContentType());
         return channel -> client.admin().cluster().putStoredScript(put, new AcknowledgedRestListener<>(channel));
     }
 }

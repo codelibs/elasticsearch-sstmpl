@@ -62,6 +62,9 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
             request.setScriptType(ScriptType.STORED);
             request.setScript(s);
         }, new ParseField("id"));
+        PARSER.declareString((request, s) -> {
+            request.setScriptLang(s);
+        }, new ParseField("lang"));
         PARSER.declareBoolean(SearchScriptTemplateRequest::setExplain, new ParseField("explain"));
         PARSER.declareBoolean(SearchScriptTemplateRequest::setProfile, new ParseField("profile"));
         PARSER.declareField((parser, request, value) -> {

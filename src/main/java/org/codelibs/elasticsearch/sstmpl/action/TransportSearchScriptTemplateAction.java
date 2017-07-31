@@ -24,6 +24,7 @@ import static org.elasticsearch.script.ScriptContext.Standard.SEARCH;
 import java.io.IOException;
 import java.util.Collections;
 
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -31,6 +32,7 @@ import org.elasticsearch.action.search.TransportSearchAction;
 import org.elasticsearch.action.support.ActionFilters;
 import org.elasticsearch.action.support.HandledTransportAction;
 import org.elasticsearch.cluster.metadata.IndexNameExpressionResolver;
+import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
@@ -39,17 +41,15 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryParseContext;
+import org.elasticsearch.script.CompiledScript;
+import org.elasticsearch.script.ExecutableScript;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptService;
-import org.elasticsearch.script.mustache.MustacheScriptEngineService;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.template.CompiledTemplate;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.TransportService;
 
 public class TransportSearchScriptTemplateAction extends HandledTransportAction<SearchScriptTemplateRequest, SearchScriptTemplateResponse> {
-
-    private static final String TEMPLATE_LANG = MustacheScriptEngineService.NAME;
 
     private final ScriptService scriptService;
     private final TransportSearchAction searchAction;
@@ -99,11 +99,19 @@ public class TransportSearchScriptTemplateAction extends HandledTransportAction<
 
     static SearchRequest convert(SearchScriptTemplateRequest searchTemplateRequest, SearchScriptTemplateResponse response, ScriptService scriptService,
                                  NamedXContentRegistry xContentRegistry) throws IOException {
-        Script script = new Script(searchTemplateRequest.getScriptType(), TEMPLATE_LANG, searchTemplateRequest.getScript(),
+        Script script = new Script(searchTemplateRequest.getScriptType(), searchTemplateRequest.getScriptLang(), searchTemplateRequest.getScript(),
                 searchTemplateRequest.getScriptParams() == null ? Collections.emptyMap() : searchTemplateRequest.getScriptParams());
-        CompiledTemplate compiledScript = scriptService.compileTemplate(script, SEARCH);
-        BytesReference source = compiledScript.run(script.getParams());
-        response.setSource(source);
+        CompiledScript compiledScript = scriptService.compile(script, SEARCH);
+        final ExecutableScript executable = scriptService.executable(compiledScript, script.getParams());
+        final Object result = executable.run();
+        BytesReference source;
+        if (result instanceof String) {
+            source = new BytesArray(result.toString());
+        } else if (result instanceof BytesReference) {
+            source = (BytesReference) result;
+        } else {
+            throw new ElasticsearchException("Query DSL is null.");
+        }
 
         SearchRequest searchRequest = searchTemplateRequest.getRequest();
         response.setSource(source);

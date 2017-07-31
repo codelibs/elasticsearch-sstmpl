@@ -29,21 +29,21 @@ import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.action.AcknowledgedRestListener;
-import org.elasticsearch.script.Script;
 
 public class RestDeleteSearchScriptTemplateAction extends BaseRestHandler {
 
     public RestDeleteSearchScriptTemplateAction(Settings settings, RestController controller) {
         super(settings);
 
-        controller.registerHandler(DELETE, "/_search/script_template/{id}", this);
+        controller.registerHandler(DELETE, "/_search/script_template/{lang}/{id}", this);
     }
 
     @Override
     public RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) throws IOException {
         String id = request.param("id");
+        String lang = request.param("lang");
 
-        DeleteStoredScriptRequest deleteStoredScriptRequest = new DeleteStoredScriptRequest(id, Script.DEFAULT_TEMPLATE_LANG);
+        DeleteStoredScriptRequest deleteStoredScriptRequest = new DeleteStoredScriptRequest(id, lang);
         return channel -> client.admin().cluster().deleteStoredScript(deleteStoredScriptRequest, new AcknowledgedRestListener<>(channel));
     }
 }

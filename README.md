@@ -13,7 +13,7 @@ Therefore, you can use any script you want in Search Template.
 
 | Version   | Elasticsearch |
 |:---------:|:-------------:|
-| master    | 2.4.X         |
+| master    | 5.5.X         |
 | 2.4.0     | 2.4.0         |
 | 2.3.1     | 2.3.5         |
 | 2.2.0     | 2.2.2         |
@@ -29,7 +29,11 @@ Please file an [issue](https://github.com/codelibs/elasticsearch-sstmpl/issues "
 
 ## Installation
 
-### Install Script-based Search Template Plugin
+### For 5.x
+
+    $ $ES_HOME/bin/elasticsearch-plugin install org.codelibs:elasticsearch-sstmpl:5.5.0
+
+### For 2.x
 
     $ $ES_HOME/bin/plugin install org.codelibs/elasticsearch-sstmpl/2.4.0
 
@@ -80,9 +84,9 @@ In order to execute the stored template, reference it by it’s name under the t
 This plugin is able to call scripts in .script index to create a template.
 To add a search template as a script,
 
-    POST /_scripts/groovy/search_query_1
+    POST /_search/script_template/groovy/search_query_1
     {
-        "script":"'{\"query\": {\"match\": {\"title\": \"' + query_string + '\"}}}'"
+        "template":"'{\"query\": {\"match\": {\"title\": \"' + query_string + '\"}}}'"
     }
 
 and then the search request is:
@@ -98,8 +102,3 @@ and then the search request is:
         }
     }
 
-### Search Template Filter
-
-You can add your code before creating this search template in your Elasticsearch's plugin.
-To create the filter, it's created with SearchTemplateFilter and then is registered to SearchTemplateModule(call registerSearchTemplateFillter method).
-The sample code is [here](https://github.com/codelibs/elasticsearch-sstmpl/blob/master/src/test/java/org/codelibs/elasticsearch/sstmpl/filter/Test1Filter.java "Test1Filter").

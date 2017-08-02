@@ -48,7 +48,7 @@ We also provides [Handlebars Lang Plugin](https://github.com/codelibs/elasticsea
 
 ### Filling in a query string with a single value
 
-    GET /_search/template
+    GET /_search/script_template
     {
         "lang": "groovy",
         "template": "'{\"query\": {\"match\": {\"title\": \"' + query_string + '\"}}}'",
@@ -68,7 +68,7 @@ If you use a groovy script, the script file is below:
 
 In order to execute the stored template, reference it by it’s name under the template key:
 
-    GET /_search/template
+    GET /_search/script_template
     {
         "lang": "groovy",
         "template": {
@@ -91,7 +91,7 @@ To add a search template as a script,
 
 and then the search request is:
 
-    GET /_search/template
+    GET /_search/script_template
     {
         "lang": "groovy",
         "template": {

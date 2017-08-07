@@ -49,11 +49,11 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
     public SearchScriptTemplateRequest() {
     }
 
-    public SearchScriptTemplateRequest(SearchRequest searchRequest) {
+    public SearchScriptTemplateRequest(final SearchRequest searchRequest) {
         this.request = searchRequest;
     }
 
-    public void setRequest(SearchRequest request) {
+    public void setRequest(final SearchRequest request) {
         this.request = request;
     }
 
@@ -61,12 +61,11 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         return request;
     }
 
-
     public boolean isSimulate() {
         return simulate;
     }
 
-    public void setSimulate(boolean simulate) {
+    public void setSimulate(final boolean simulate) {
         this.simulate = simulate;
     }
 
@@ -74,7 +73,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         return explain;
     }
 
-    public void setExplain(boolean explain) {
+    public void setExplain(final boolean explain) {
         this.explain = explain;
     }
 
@@ -82,7 +81,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         return profile;
     }
 
-    public void setProfile(boolean profile) {
+    public void setProfile(final boolean profile) {
         this.profile = profile;
     }
 
@@ -90,7 +89,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         return scriptType;
     }
 
-    public void setScriptType(ScriptType scriptType) {
+    public void setScriptType(final ScriptType scriptType) {
         this.scriptType = scriptType;
     }
 
@@ -98,7 +97,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         return script;
     }
 
-    public void setScript(String script) {
+    public void setScript(final String script) {
         this.script = script;
     }
 
@@ -106,7 +105,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         return scriptLang;
     }
 
-    public void setScriptLang(String scriptLang) {
+    public void setScriptLang(final String scriptLang) {
         this.scriptLang = scriptLang;
     }
 
@@ -114,7 +113,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         return scriptParams;
     }
 
-    public void setScriptParams(Map<String, Object> scriptParams) {
+    public void setScriptParams(final Map<String, Object> scriptParams) {
         this.scriptParams = scriptParams;
     }
 
@@ -134,7 +133,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
             if (request == null) {
                 validationException = addValidationError("search request is missing", validationException);
             } else {
-                ActionRequestValidationException ex = request.validate();
+                final ActionRequestValidationException ex = request.validate();
                 if (ex != null) {
                     if (validationException == null) {
                         validationException = new ActionRequestValidationException();
@@ -147,7 +146,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
     }
 
     @Override
-    public void readFrom(StreamInput in) throws IOException {
+    public void readFrom(final StreamInput in) throws IOException {
         super.readFrom(in);
         request = in.readOptionalStreamable(SearchRequest::new);
         simulate = in.readBoolean();
@@ -162,7 +161,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
     }
 
     @Override
-    public void writeTo(StreamOutput out) throws IOException {
+    public void writeTo(final StreamOutput out) throws IOException {
         super.writeTo(out);
         out.writeOptionalStreamable(request);
         out.writeBoolean(simulate);
@@ -171,7 +170,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         scriptType.writeTo(out);
         out.writeOptionalString(script);
         out.writeOptionalString(scriptLang);
-        boolean hasParams = scriptParams != null;
+        final boolean hasParams = scriptParams != null;
         out.writeBoolean(hasParams);
         if (hasParams) {
             out.writeMap(scriptParams);

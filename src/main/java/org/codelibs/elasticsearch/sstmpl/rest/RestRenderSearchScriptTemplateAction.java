@@ -36,7 +36,7 @@ import org.elasticsearch.rest.action.RestToXContentListener;
 import org.elasticsearch.script.ScriptType;
 
 public class RestRenderSearchScriptTemplateAction extends BaseRestHandler {
-    public RestRenderSearchScriptTemplateAction(Settings settings, RestController controller) {
+    public RestRenderSearchScriptTemplateAction(final Settings settings, final RestController controller) {
         super(settings);
         controller.registerHandler(GET, "/_render/script_template", this);
         controller.registerHandler(POST, "/_render/script_template", this);
@@ -45,7 +45,7 @@ public class RestRenderSearchScriptTemplateAction extends BaseRestHandler {
     }
 
     @Override
-    public RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) throws IOException {
+    public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
         // Creates the render template request
         SearchScriptTemplateRequest renderRequest;
         try (XContentParser parser = request.contentOrSourceParamParser()) {
@@ -53,7 +53,7 @@ public class RestRenderSearchScriptTemplateAction extends BaseRestHandler {
         }
         renderRequest.setSimulate(true);
 
-        String id = request.param("id");
+        final String id = request.param("id");
         if (id != null) {
             renderRequest.setScriptType(ScriptType.STORED);
             renderRequest.setScript(id);

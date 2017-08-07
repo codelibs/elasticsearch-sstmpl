@@ -38,7 +38,7 @@ public class MultiSearchScriptTemplateAction
     }
 
     @Override
-    public MultiSearchScriptTemplateRequestBuilder newRequestBuilder(ElasticsearchClient client) {
+    public MultiSearchScriptTemplateRequestBuilder newRequestBuilder(final ElasticsearchClient client) {
         return new MultiSearchScriptTemplateRequestBuilder(client, this);
     }
 }

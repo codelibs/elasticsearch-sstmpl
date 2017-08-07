@@ -39,17 +39,18 @@ import org.elasticsearch.script.ScriptService;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.TransportService;
 
-public class TransportMultiSearchScriptTemplateAction extends HandledTransportAction<MultiSearchScriptTemplateRequest, MultiSearchScriptTemplateResponse> {
+public class TransportMultiSearchScriptTemplateAction
+        extends HandledTransportAction<MultiSearchScriptTemplateRequest, MultiSearchScriptTemplateResponse> {
 
     private final ScriptService scriptService;
     private final NamedXContentRegistry xContentRegistry;
     private final TransportMultiSearchAction multiSearchAction;
 
     @Inject
-    public TransportMultiSearchScriptTemplateAction(Settings settings, ThreadPool threadPool, TransportService transportService,
-                                              ActionFilters actionFilters, IndexNameExpressionResolver resolver,
-                                              ScriptService scriptService, NamedXContentRegistry xContentRegistry,
-                                              TransportMultiSearchAction multiSearchAction) {
+    public TransportMultiSearchScriptTemplateAction(final Settings settings, final ThreadPool threadPool,
+            final TransportService transportService, final ActionFilters actionFilters, final IndexNameExpressionResolver resolver,
+            final ScriptService scriptService, final NamedXContentRegistry xContentRegistry,
+            final TransportMultiSearchAction multiSearchAction) {
         super(settings, MultiSearchScriptTemplateAction.NAME, threadPool, transportService, actionFilters, resolver,
                 MultiSearchScriptTemplateRequest::new);
         this.scriptService = scriptService;
@@ -58,22 +59,23 @@ public class TransportMultiSearchScriptTemplateAction extends HandledTransportAc
     }
 
     @Override
-    protected void doExecute(MultiSearchScriptTemplateRequest request, ActionListener<MultiSearchScriptTemplateResponse> listener) {
-        List<Integer> originalSlots = new ArrayList<>();
-        MultiSearchRequest multiSearchRequest = new MultiSearchRequest();
+    protected void doExecute(final MultiSearchScriptTemplateRequest request,
+            final ActionListener<MultiSearchScriptTemplateResponse> listener) {
+        final List<Integer> originalSlots = new ArrayList<>();
+        final MultiSearchRequest multiSearchRequest = new MultiSearchRequest();
         multiSearchRequest.indicesOptions(request.indicesOptions());
         if (request.maxConcurrentSearchRequests() != 0) {
             multiSearchRequest.maxConcurrentSearchRequests(request.maxConcurrentSearchRequests());
         }
 
-        MultiSearchScriptTemplateResponse.Item[] items = new MultiSearchScriptTemplateResponse.Item[request.requests().size()];
+        final MultiSearchScriptTemplateResponse.Item[] items = new MultiSearchScriptTemplateResponse.Item[request.requests().size()];
         for (int i = 0; i < items.length; i++) {
-            SearchScriptTemplateRequest searchTemplateRequest = request.requests().get(i);
-            SearchScriptTemplateResponse searchTemplateResponse = new SearchScriptTemplateResponse();
+            final SearchScriptTemplateRequest searchTemplateRequest = request.requests().get(i);
+            final SearchScriptTemplateResponse searchTemplateResponse = new SearchScriptTemplateResponse();
             SearchRequest searchRequest;
             try {
                 searchRequest = convert(searchTemplateRequest, searchTemplateResponse, scriptService, xContentRegistry);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 items[i] = new MultiSearchScriptTemplateResponse.Item(null, e);
                 continue;
             }
@@ -86,8 +88,8 @@ public class TransportMultiSearchScriptTemplateAction extends HandledTransportAc
 
         multiSearchAction.execute(multiSearchRequest, ActionListener.wrap(r -> {
             for (int i = 0; i < r.getResponses().length; i++) {
-                MultiSearchResponse.Item item = r.getResponses()[i];
-                int originalSlot = originalSlots.get(i);
+                final MultiSearchResponse.Item item = r.getResponses()[i];
+                final int originalSlot = originalSlots.get(i);
                 if (item.isFailure()) {
                     items[originalSlot] = new MultiSearchScriptTemplateResponse.Item(null, item.getFailure());
                 } else {

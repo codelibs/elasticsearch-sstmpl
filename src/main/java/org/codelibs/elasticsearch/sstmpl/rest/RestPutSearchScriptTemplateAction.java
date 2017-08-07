@@ -34,7 +34,7 @@ import org.elasticsearch.rest.action.AcknowledgedRestListener;
 
 public class RestPutSearchScriptTemplateAction extends BaseRestHandler {
 
-    public RestPutSearchScriptTemplateAction(Settings settings, RestController controller) {
+    public RestPutSearchScriptTemplateAction(final Settings settings, final RestController controller) {
         super(settings);
 
         controller.registerHandler(POST, "/_search/script_template/{lang}/{id}", this);
@@ -42,12 +42,12 @@ public class RestPutSearchScriptTemplateAction extends BaseRestHandler {
     }
 
     @Override
-    public RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) throws IOException {
-        String id = request.param("id");
-        String lang = request.param("lang");
-        BytesReference content = request.requiredContent();
+    public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
+        final String id = request.param("id");
+        final String lang = request.param("lang");
+        final BytesReference content = request.requiredContent();
 
-        PutStoredScriptRequest put = new PutStoredScriptRequest(id, lang, content, request.getXContentType());
+        final PutStoredScriptRequest put = new PutStoredScriptRequest(id, lang, content, request.getXContentType());
         return channel -> client.admin().cluster().putStoredScript(put, new AcknowledgedRestListener<>(channel));
     }
 }

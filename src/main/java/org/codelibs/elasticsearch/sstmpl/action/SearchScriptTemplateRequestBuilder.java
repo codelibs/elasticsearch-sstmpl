@@ -29,20 +29,20 @@ import org.elasticsearch.script.ScriptType;
 public class SearchScriptTemplateRequestBuilder
         extends ActionRequestBuilder<SearchScriptTemplateRequest, SearchScriptTemplateResponse, SearchScriptTemplateRequestBuilder> {
 
-    SearchScriptTemplateRequestBuilder(ElasticsearchClient client, SearchScriptTemplateAction action) {
+    SearchScriptTemplateRequestBuilder(final ElasticsearchClient client, final SearchScriptTemplateAction action) {
         super(client, action, new SearchScriptTemplateRequest());
     }
 
-    public SearchScriptTemplateRequestBuilder(ElasticsearchClient client) {
+    public SearchScriptTemplateRequestBuilder(final ElasticsearchClient client) {
         this(client, SearchScriptTemplateAction.INSTANCE);
     }
 
-    public SearchScriptTemplateRequestBuilder setRequest(SearchRequest searchRequest) {
+    public SearchScriptTemplateRequestBuilder setRequest(final SearchRequest searchRequest) {
         request.setRequest(searchRequest);
         return this;
     }
 
-    public SearchScriptTemplateRequestBuilder setSimulate(boolean simulate) {
+    public SearchScriptTemplateRequestBuilder setSimulate(final boolean simulate) {
         request.setSimulate(simulate);
         return this;
     }
@@ -50,7 +50,7 @@ public class SearchScriptTemplateRequestBuilder
     /**
      * Enables explanation for each hit on how its score was computed. Disabled by default
      */
-    public SearchScriptTemplateRequestBuilder setExplain(boolean explain) {
+    public SearchScriptTemplateRequestBuilder setExplain(final boolean explain) {
         request.setExplain(explain);
         return this;
     }
@@ -58,22 +58,22 @@ public class SearchScriptTemplateRequestBuilder
     /**
      * Enables profiling of the query. Disabled by default
      */
-    public SearchScriptTemplateRequestBuilder setProfile(boolean profile) {
+    public SearchScriptTemplateRequestBuilder setProfile(final boolean profile) {
         request.setProfile(profile);
         return this;
     }
 
-    public SearchScriptTemplateRequestBuilder setScriptType(ScriptType scriptType) {
+    public SearchScriptTemplateRequestBuilder setScriptType(final ScriptType scriptType) {
         request.setScriptType(scriptType);
         return this;
     }
 
-    public SearchScriptTemplateRequestBuilder setScript(String script) {
+    public SearchScriptTemplateRequestBuilder setScript(final String script) {
         request.setScript(script);
         return this;
     }
 
-    public SearchScriptTemplateRequestBuilder setScriptParams(Map<String, Object> scriptParams) {
+    public SearchScriptTemplateRequestBuilder setScriptParams(final Map<String, Object> scriptParams) {
         request.setScriptParams(scriptParams);
         return this;
     }

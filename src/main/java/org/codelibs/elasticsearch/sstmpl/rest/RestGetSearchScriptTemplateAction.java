@@ -43,29 +43,29 @@ public class RestGetSearchScriptTemplateAction extends BaseRestHandler {
 
     public static final ParseField FOUND_PARSE_FIELD = new ParseField("found");
 
-    public RestGetSearchScriptTemplateAction(Settings settings, RestController controller) {
+    public RestGetSearchScriptTemplateAction(final Settings settings, final RestController controller) {
         super(settings);
 
         controller.registerHandler(GET, "/_search/script_template/{lang}/{id}", this);
     }
 
     @Override
-    public RestChannelConsumer prepareRequest(final RestRequest request, NodeClient client) throws IOException {
-        String id = request.param("id");
-        String lang = request.param("lang");
+    public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
+        final String id = request.param("id");
+        final String lang = request.param("lang");
 
-        GetStoredScriptRequest getRequest = new GetStoredScriptRequest(id, lang);
+        final GetStoredScriptRequest getRequest = new GetStoredScriptRequest(id, lang);
 
         return channel -> client.admin().cluster().getStoredScript(getRequest, new RestBuilderListener<GetStoredScriptResponse>(channel) {
             @Override
-            public RestResponse buildResponse(GetStoredScriptResponse response, XContentBuilder builder) throws Exception {
+            public RestResponse buildResponse(final GetStoredScriptResponse response, final XContentBuilder builder) throws Exception {
                 builder.startObject();
                 builder.field(_ID_PARSE_FIELD.getPreferredName(), id);
 
                 builder.field(StoredScriptSource.LANG_PARSE_FIELD.getPreferredName(), lang);
 
-                StoredScriptSource source = response.getSource();
-                boolean found = source != null;
+                final StoredScriptSource source = response.getSource();
+                final boolean found = source != null;
                 builder.field(FOUND_PARSE_FIELD.getPreferredName(), found);
 
                 if (found) {

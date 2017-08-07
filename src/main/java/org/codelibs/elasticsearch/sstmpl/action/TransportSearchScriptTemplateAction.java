@@ -56,52 +56,52 @@ public class TransportSearchScriptTemplateAction extends HandledTransportAction<
     private final NamedXContentRegistry xContentRegistry;
 
     @Inject
-    public TransportSearchScriptTemplateAction(Settings settings, ThreadPool threadPool, TransportService transportService,
-                                         ActionFilters actionFilters, IndexNameExpressionResolver resolver,
-                                         ScriptService scriptService,
-                                         TransportSearchAction searchAction,
-                                         NamedXContentRegistry xContentRegistry) {
-        super(settings, SearchScriptTemplateAction.NAME, threadPool, transportService, actionFilters, resolver, SearchScriptTemplateRequest::new);
+    public TransportSearchScriptTemplateAction(final Settings settings, final ThreadPool threadPool,
+            final TransportService transportService, final ActionFilters actionFilters, final IndexNameExpressionResolver resolver,
+            final ScriptService scriptService, final TransportSearchAction searchAction, final NamedXContentRegistry xContentRegistry) {
+        super(settings, SearchScriptTemplateAction.NAME, threadPool, transportService, actionFilters, resolver,
+                SearchScriptTemplateRequest::new);
         this.scriptService = scriptService;
         this.searchAction = searchAction;
         this.xContentRegistry = xContentRegistry;
     }
 
     @Override
-    protected void doExecute(SearchScriptTemplateRequest request, ActionListener<SearchScriptTemplateResponse> listener) {
+    protected void doExecute(final SearchScriptTemplateRequest request, final ActionListener<SearchScriptTemplateResponse> listener) {
         final SearchScriptTemplateResponse response = new SearchScriptTemplateResponse();
         try {
-            SearchRequest searchRequest = convert(request, response, scriptService, xContentRegistry);
+            final SearchRequest searchRequest = convert(request, response, scriptService, xContentRegistry);
             if (searchRequest != null) {
                 searchAction.execute(searchRequest, new ActionListener<SearchResponse>() {
                     @Override
-                    public void onResponse(SearchResponse searchResponse) {
+                    public void onResponse(final SearchResponse searchResponse) {
                         try {
                             response.setResponse(searchResponse);
                             listener.onResponse(response);
-                        } catch (Exception t) {
+                        } catch (final Exception t) {
                             listener.onFailure(t);
                         }
                     }
 
                     @Override
-                    public void onFailure(Exception t) {
+                    public void onFailure(final Exception t) {
                         listener.onFailure(t);
                     }
                 });
             } else {
                 listener.onResponse(response);
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             listener.onFailure(e);
         }
     }
 
-    static SearchRequest convert(SearchScriptTemplateRequest searchTemplateRequest, SearchScriptTemplateResponse response, ScriptService scriptService,
-                                 NamedXContentRegistry xContentRegistry) throws IOException {
-        Script script = new Script(searchTemplateRequest.getScriptType(), searchTemplateRequest.getScriptLang(), searchTemplateRequest.getScript(),
-                searchTemplateRequest.getScriptParams() == null ? Collections.emptyMap() : searchTemplateRequest.getScriptParams());
-        CompiledScript compiledScript = scriptService.compile(script, SEARCH);
+    static SearchRequest convert(final SearchScriptTemplateRequest searchTemplateRequest, final SearchScriptTemplateResponse response,
+            final ScriptService scriptService, final NamedXContentRegistry xContentRegistry) throws IOException {
+        final Script script =
+                new Script(searchTemplateRequest.getScriptType(), searchTemplateRequest.getScriptLang(), searchTemplateRequest.getScript(),
+                        searchTemplateRequest.getScriptParams() == null ? Collections.emptyMap() : searchTemplateRequest.getScriptParams());
+        final CompiledScript compiledScript = scriptService.compile(script, SEARCH);
         final ExecutableScript executable = scriptService.executable(compiledScript, script.getParams());
         final Object result = executable.run();
         BytesReference source;
@@ -113,14 +113,14 @@ public class TransportSearchScriptTemplateAction extends HandledTransportAction<
             throw new ElasticsearchException("Query DSL is null.");
         }
 
-        SearchRequest searchRequest = searchTemplateRequest.getRequest();
+        final SearchRequest searchRequest = searchTemplateRequest.getRequest();
         response.setSource(source);
         if (searchTemplateRequest.isSimulate()) {
             return null;
         }
 
         try (XContentParser parser = XContentFactory.xContent(XContentType.JSON).createParser(xContentRegistry, source)) {
-            SearchSourceBuilder builder = SearchSourceBuilder.searchSource();
+            final SearchSourceBuilder builder = SearchSourceBuilder.searchSource();
             builder.parseXContent(new QueryParseContext(parser));
             builder.explain(searchTemplateRequest.isExplain());
             builder.profile(searchTemplateRequest.isProfile());

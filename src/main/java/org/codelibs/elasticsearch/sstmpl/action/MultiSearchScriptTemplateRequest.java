@@ -44,7 +44,7 @@ public class MultiSearchScriptTemplateRequest extends ActionRequest implements C
      * Add a search template request to execute. Note, the order is important, the search response will be returned in the
      * same order as the search requests.
      */
-    public MultiSearchScriptTemplateRequest add(SearchScriptTemplateRequestBuilder request) {
+    public MultiSearchScriptTemplateRequest add(final SearchScriptTemplateRequestBuilder request) {
         requests.add(request.request());
         return this;
     }
@@ -53,11 +53,10 @@ public class MultiSearchScriptTemplateRequest extends ActionRequest implements C
      * Add a search template request to execute. Note, the order is important, the search response will be returned in the
      * same order as the search requests.
      */
-    public MultiSearchScriptTemplateRequest add(SearchScriptTemplateRequest request) {
+    public MultiSearchScriptTemplateRequest add(final SearchScriptTemplateRequest request) {
         requests.add(request);
         return this;
     }
-
 
     /**
      * Returns the amount of search requests specified in this multi search requests are allowed to be ran concurrently.
@@ -69,7 +68,7 @@ public class MultiSearchScriptTemplateRequest extends ActionRequest implements C
     /**
      * Sets how many search requests specified in this multi search requests are allowed to be ran concurrently.
      */
-    public MultiSearchScriptTemplateRequest maxConcurrentSearchRequests(int maxConcurrentSearchRequests) {
+    public MultiSearchScriptTemplateRequest maxConcurrentSearchRequests(final int maxConcurrentSearchRequests) {
         if (maxConcurrentSearchRequests < 1) {
             throw new IllegalArgumentException("maxConcurrentSearchRequests must be positive");
         }
@@ -88,8 +87,8 @@ public class MultiSearchScriptTemplateRequest extends ActionRequest implements C
         if (requests.isEmpty()) {
             validationException = addValidationError("no requests added", validationException);
         }
-        for (SearchScriptTemplateRequest request : requests) {
-            ActionRequestValidationException ex = request.validate();
+        for (final SearchScriptTemplateRequest request : requests) {
+            final ActionRequestValidationException ex = request.validate();
             if (ex != null) {
                 if (validationException == null) {
                     validationException = new ActionRequestValidationException();
@@ -104,13 +103,13 @@ public class MultiSearchScriptTemplateRequest extends ActionRequest implements C
         return indicesOptions;
     }
 
-    public MultiSearchScriptTemplateRequest indicesOptions(IndicesOptions indicesOptions) {
+    public MultiSearchScriptTemplateRequest indicesOptions(final IndicesOptions indicesOptions) {
         this.indicesOptions = indicesOptions;
         return this;
     }
 
     @Override
-    public void readFrom(StreamInput in) throws IOException {
+    public void readFrom(final StreamInput in) throws IOException {
         super.readFrom(in);
         if (in.getVersion().onOrAfter(Version.V_5_5_0)) {
             maxConcurrentSearchRequests = in.readVInt();
@@ -119,7 +118,7 @@ public class MultiSearchScriptTemplateRequest extends ActionRequest implements C
     }
 
     @Override
-    public void writeTo(StreamOutput out) throws IOException {
+    public void writeTo(final StreamOutput out) throws IOException {
         super.writeTo(out);
         if (out.getVersion().onOrAfter(Version.V_5_5_0)) {
             out.writeVInt(maxConcurrentSearchRequests);

@@ -51,9 +51,8 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
     private static final ObjectParser<SearchScriptTemplateRequest, Void> PARSER;
     static {
         PARSER = new ObjectParser<>("search_template");
-        PARSER.declareField((parser, request, s) ->
-                        request.setScriptParams(parser.map())
-                , new ParseField("params"), ObjectParser.ValueType.OBJECT);
+        PARSER.declareField((parser, request, s) -> request.setScriptParams(parser.map()), new ParseField("params"),
+                ObjectParser.ValueType.OBJECT);
         PARSER.declareString((request, s) -> {
             request.setScriptType(ScriptType.FILE);
             request.setScript(s);
@@ -73,7 +72,7 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
                 //convert the template to json which is the only supported XContentType (see CustomMustacheFactory#createEncoder)
                 try (XContentBuilder builder = XContentFactory.jsonBuilder()) {
                     request.setScript(builder.copyCurrentStructure(parser).string());
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     throw new ParsingException(parser.getTokenLocation(), "Could not parse inline template", e);
                 }
             } else {
@@ -82,7 +81,7 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
         }, new ParseField("inline", "template"), ObjectParser.ValueType.OBJECT_OR_STRING);
     }
 
-    public RestSearchScriptTemplateAction(Settings settings, RestController controller) {
+    public RestSearchScriptTemplateAction(final Settings settings, final RestController controller) {
         super(settings);
 
         controller.registerHandler(GET, "/_search/script_template", this);
@@ -94,9 +93,9 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
     }
 
     @Override
-    public RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) throws IOException {
+    public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
         // Creates the search request with all required params
-        SearchRequest searchRequest = new SearchRequest();
+        final SearchRequest searchRequest = new SearchRequest();
         RestSearchAction.parseSearchRequest(searchRequest, request, null);
 
         // Creates the search template request
@@ -106,10 +105,11 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
         }
         searchTemplateRequest.setRequest(searchRequest);
 
-        return channel -> client.execute(SearchScriptTemplateAction.INSTANCE, searchTemplateRequest, new RestStatusToXContentListener<>(channel));
+        return channel -> client.execute(SearchScriptTemplateAction.INSTANCE, searchTemplateRequest,
+                new RestStatusToXContentListener<>(channel));
     }
 
-    public static SearchScriptTemplateRequest parse(XContentParser parser) throws IOException {
+    public static SearchScriptTemplateRequest parse(final XContentParser parser) throws IOException {
         return PARSER.parse(parser, new SearchScriptTemplateRequest(), null);
     }
 

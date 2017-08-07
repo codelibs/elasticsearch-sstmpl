@@ -31,7 +31,7 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
 
-public class SearchScriptTemplateResponse  extends ActionResponse implements StatusToXContentObject {
+public class SearchScriptTemplateResponse extends ActionResponse implements StatusToXContentObject {
 
     /** Contains the source of the rendered template **/
     private BytesReference source;
@@ -46,7 +46,7 @@ public class SearchScriptTemplateResponse  extends ActionResponse implements Sta
         return source;
     }
 
-    public void setSource(BytesReference source) {
+    public void setSource(final BytesReference source) {
         this.source = source;
     }
 
@@ -54,7 +54,7 @@ public class SearchScriptTemplateResponse  extends ActionResponse implements Sta
         return response;
     }
 
-    public void setResponse(SearchResponse searchResponse) {
+    public void setResponse(final SearchResponse searchResponse) {
         this.response = searchResponse;
     }
 
@@ -63,21 +63,21 @@ public class SearchScriptTemplateResponse  extends ActionResponse implements Sta
     }
 
     @Override
-    public void writeTo(StreamOutput out) throws IOException {
+    public void writeTo(final StreamOutput out) throws IOException {
         super.writeTo(out);
         out.writeOptionalBytesReference(source);
         out.writeOptionalStreamable(response);
     }
 
     @Override
-    public void readFrom(StreamInput in) throws IOException {
+    public void readFrom(final StreamInput in) throws IOException {
         super.readFrom(in);
         source = in.readOptionalBytesReference();
         response = in.readOptionalStreamable(SearchResponse::new);
     }
 
     @Override
-    public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
+    public XContentBuilder toXContent(final XContentBuilder builder, final Params params) throws IOException {
         if (hasResponse()) {
             response.toXContent(builder, params);
         } else {

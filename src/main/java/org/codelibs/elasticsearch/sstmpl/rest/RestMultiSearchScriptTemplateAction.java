@@ -45,7 +45,7 @@ public class RestMultiSearchScriptTemplateAction extends BaseRestHandler {
 
     private final boolean allowExplicitIndex;
 
-    public RestMultiSearchScriptTemplateAction(Settings settings, RestController controller) {
+    public RestMultiSearchScriptTemplateAction(final Settings settings, final RestController controller) {
         super(settings);
         this.allowExplicitIndex = MULTI_ALLOW_EXPLICIT_INDEX.get(settings);
 
@@ -58,16 +58,17 @@ public class RestMultiSearchScriptTemplateAction extends BaseRestHandler {
     }
 
     @Override
-    public RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) throws IOException {
-        MultiSearchScriptTemplateRequest multiRequest = parseRequest(request, allowExplicitIndex);
+    public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
+        final MultiSearchScriptTemplateRequest multiRequest = parseRequest(request, allowExplicitIndex);
         return channel -> client.execute(MultiSearchScriptTemplateAction.INSTANCE, multiRequest, new RestToXContentListener<>(channel));
     }
 
     /**
      * Parses a {@link RestRequest} body and returns a {@link MultiSearchScriptTemplateRequest}
      */
-    public static MultiSearchScriptTemplateRequest parseRequest(RestRequest restRequest, boolean allowExplicitIndex) throws IOException {
-        MultiSearchScriptTemplateRequest multiRequest = new MultiSearchScriptTemplateRequest();
+    public static MultiSearchScriptTemplateRequest parseRequest(final RestRequest restRequest, final boolean allowExplicitIndex)
+            throws IOException {
+        final MultiSearchScriptTemplateRequest multiRequest = new MultiSearchScriptTemplateRequest();
         if (restRequest.hasParam("max_concurrent_searches")) {
             multiRequest.maxConcurrentSearchRequests(restRequest.paramAsInt("max_concurrent_searches", 0));
         }
@@ -75,14 +76,14 @@ public class RestMultiSearchScriptTemplateAction extends BaseRestHandler {
         RestMultiSearchAction.parseMultiLineRequest(restRequest, multiRequest.indicesOptions(), allowExplicitIndex,
                 (searchRequest, bytes) -> {
                     try {
-                        SearchScriptTemplateRequest searchTemplateRequest = RestSearchScriptTemplateAction.parse(bytes);
+                        final SearchScriptTemplateRequest searchTemplateRequest = RestSearchScriptTemplateAction.parse(bytes);
                         if (searchTemplateRequest.getScript() != null) {
                             searchTemplateRequest.setRequest(searchRequest);
                             multiRequest.add(searchTemplateRequest);
                         } else {
                             throw new IllegalArgumentException("Malformed search template");
                         }
-                    } catch (IOException e) {
+                    } catch (final IOException e) {
                         throw new ElasticsearchParseException("Exception when parsing search template request", e);
                     }
                 });

@@ -34,7 +34,8 @@ import org.elasticsearch.common.xcontent.ToXContent;
 import org.elasticsearch.common.xcontent.ToXContentObject;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 
-public class MultiSearchScriptTemplateResponse extends ActionResponse implements Iterable<MultiSearchScriptTemplateResponse.Item>, ToXContentObject {
+public class MultiSearchScriptTemplateResponse extends ActionResponse
+        implements Iterable<MultiSearchScriptTemplateResponse.Item>, ToXContentObject {
 
     /**
      * A search template response item, holding the actual search template response, or an error message if it failed.
@@ -46,7 +47,7 @@ public class MultiSearchScriptTemplateResponse extends ActionResponse implements
         Item() {
         }
 
-        public Item(SearchScriptTemplateResponse response, Exception exception) {
+        public Item(final SearchScriptTemplateResponse response, final Exception exception) {
             this.response = response;
             this.exception = exception;
         }
@@ -74,14 +75,14 @@ public class MultiSearchScriptTemplateResponse extends ActionResponse implements
             return this.response;
         }
 
-        public static Item readItem(StreamInput in) throws IOException {
-            Item item = new Item();
+        public static Item readItem(final StreamInput in) throws IOException {
+            final Item item = new Item();
             item.readFrom(in);
             return item;
         }
 
         @Override
-        public void readFrom(StreamInput in) throws IOException {
+        public void readFrom(final StreamInput in) throws IOException {
             if (in.readBoolean()) {
                 this.response = new SearchScriptTemplateResponse();
                 response.readFrom(in);
@@ -91,7 +92,7 @@ public class MultiSearchScriptTemplateResponse extends ActionResponse implements
         }
 
         @Override
-        public void writeTo(StreamOutput out) throws IOException {
+        public void writeTo(final StreamOutput out) throws IOException {
             if (response != null) {
                 out.writeBoolean(true);
                 response.writeTo(out);
@@ -111,7 +112,7 @@ public class MultiSearchScriptTemplateResponse extends ActionResponse implements
     MultiSearchScriptTemplateResponse() {
     }
 
-    public MultiSearchScriptTemplateResponse(Item[] items) {
+    public MultiSearchScriptTemplateResponse(final Item[] items) {
         this.items = items;
     }
 
@@ -128,7 +129,7 @@ public class MultiSearchScriptTemplateResponse extends ActionResponse implements
     }
 
     @Override
-    public void readFrom(StreamInput in) throws IOException {
+    public void readFrom(final StreamInput in) throws IOException {
         super.readFrom(in);
         items = new Item[in.readVInt()];
         for (int i = 0; i < items.length; i++) {
@@ -137,19 +138,19 @@ public class MultiSearchScriptTemplateResponse extends ActionResponse implements
     }
 
     @Override
-    public void writeTo(StreamOutput out) throws IOException {
+    public void writeTo(final StreamOutput out) throws IOException {
         super.writeTo(out);
         out.writeVInt(items.length);
-        for (Item item : items) {
+        for (final Item item : items) {
             item.writeTo(out);
         }
     }
 
     @Override
-    public XContentBuilder toXContent(XContentBuilder builder, ToXContent.Params params) throws IOException {
+    public XContentBuilder toXContent(final XContentBuilder builder, final ToXContent.Params params) throws IOException {
         builder.startObject();
         builder.startArray(Fields.RESPONSES);
-        for (Item item : items) {
+        for (final Item item : items) {
             if (item.isFailure()) {
                 builder.startObject();
                 ElasticsearchException.generateFailureXContent(builder, params, item.getFailure(), true);

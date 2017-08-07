@@ -32,18 +32,18 @@ import org.elasticsearch.rest.action.AcknowledgedRestListener;
 
 public class RestDeleteSearchScriptTemplateAction extends BaseRestHandler {
 
-    public RestDeleteSearchScriptTemplateAction(Settings settings, RestController controller) {
+    public RestDeleteSearchScriptTemplateAction(final Settings settings, final RestController controller) {
         super(settings);
 
         controller.registerHandler(DELETE, "/_search/script_template/{lang}/{id}", this);
     }
 
     @Override
-    public RestChannelConsumer prepareRequest(RestRequest request, NodeClient client) throws IOException {
-        String id = request.param("id");
-        String lang = request.param("lang");
+    public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
+        final String id = request.param("id");
+        final String lang = request.param("lang");
 
-        DeleteStoredScriptRequest deleteStoredScriptRequest = new DeleteStoredScriptRequest(id, lang);
+        final DeleteStoredScriptRequest deleteStoredScriptRequest = new DeleteStoredScriptRequest(id, lang);
         return channel -> client.admin().cluster().deleteStoredScript(deleteStoredScriptRequest, new AcknowledgedRestListener<>(channel));
     }
 }

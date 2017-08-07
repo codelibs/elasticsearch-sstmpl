@@ -23,14 +23,14 @@ import org.elasticsearch.action.ActionRequestBuilder;
 import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.ElasticsearchClient;
 
-public class MultiSearchScriptTemplateRequestBuilder
-        extends ActionRequestBuilder<MultiSearchScriptTemplateRequest, MultiSearchScriptTemplateResponse, MultiSearchScriptTemplateRequestBuilder> {
+public class MultiSearchScriptTemplateRequestBuilder extends
+        ActionRequestBuilder<MultiSearchScriptTemplateRequest, MultiSearchScriptTemplateResponse, MultiSearchScriptTemplateRequestBuilder> {
 
-    protected MultiSearchScriptTemplateRequestBuilder(ElasticsearchClient client, MultiSearchScriptTemplateAction action) {
+    protected MultiSearchScriptTemplateRequestBuilder(final ElasticsearchClient client, final MultiSearchScriptTemplateAction action) {
         super(client, action, new MultiSearchScriptTemplateRequest());
     }
 
-    public MultiSearchScriptTemplateRequestBuilder add(SearchScriptTemplateRequest request) {
+    public MultiSearchScriptTemplateRequestBuilder add(final SearchScriptTemplateRequest request) {
         if (request.getRequest().indicesOptions() == IndicesOptions.strictExpandOpenAndForbidClosed()
                 && request().indicesOptions() != IndicesOptions.strictExpandOpenAndForbidClosed()) {
             request.getRequest().indicesOptions(request().indicesOptions());
@@ -40,7 +40,7 @@ public class MultiSearchScriptTemplateRequestBuilder
         return this;
     }
 
-    public MultiSearchScriptTemplateRequestBuilder add(SearchScriptTemplateRequestBuilder request) {
+    public MultiSearchScriptTemplateRequestBuilder add(final SearchScriptTemplateRequestBuilder request) {
         if (request.request().getRequest().indicesOptions() == IndicesOptions.strictExpandOpenAndForbidClosed()
                 && request().indicesOptions() != IndicesOptions.strictExpandOpenAndForbidClosed()) {
             request.request().getRequest().indicesOptions(request().indicesOptions());
@@ -50,7 +50,7 @@ public class MultiSearchScriptTemplateRequestBuilder
         return this;
     }
 
-    public MultiSearchScriptTemplateRequestBuilder setIndicesOptions(IndicesOptions indicesOptions) {
+    public MultiSearchScriptTemplateRequestBuilder setIndicesOptions(final IndicesOptions indicesOptions) {
         request().indicesOptions(indicesOptions);
         return this;
     }
@@ -58,7 +58,7 @@ public class MultiSearchScriptTemplateRequestBuilder
     /**
      * Sets how many search requests specified in this multi search requests are allowed to be ran concurrently.
      */
-    public MultiSearchScriptTemplateRequestBuilder setMaxConcurrentSearchRequests(int maxConcurrentSearchRequests) {
+    public MultiSearchScriptTemplateRequestBuilder setMaxConcurrentSearchRequests(final int maxConcurrentSearchRequests) {
         request().maxConcurrentSearchRequests(maxConcurrentSearchRequests);
         return this;
     }

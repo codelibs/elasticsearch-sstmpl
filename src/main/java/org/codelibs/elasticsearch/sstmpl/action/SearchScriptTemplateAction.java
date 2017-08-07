@@ -22,7 +22,8 @@ package org.codelibs.elasticsearch.sstmpl.action;
 import org.elasticsearch.action.Action;
 import org.elasticsearch.client.ElasticsearchClient;
 
-public class SearchScriptTemplateAction extends Action<SearchScriptTemplateRequest, SearchScriptTemplateResponse, SearchScriptTemplateRequestBuilder> {
+public class SearchScriptTemplateAction
+        extends Action<SearchScriptTemplateRequest, SearchScriptTemplateResponse, SearchScriptTemplateRequestBuilder> {
 
     public static final SearchScriptTemplateAction INSTANCE = new SearchScriptTemplateAction();
     public static final String NAME = "indices:data/read/search/script_template";
@@ -32,7 +33,7 @@ public class SearchScriptTemplateAction extends Action<SearchScriptTemplateReque
     }
 
     @Override
-    public SearchScriptTemplateRequestBuilder newRequestBuilder(ElasticsearchClient client) {
+    public SearchScriptTemplateRequestBuilder newRequestBuilder(final ElasticsearchClient client) {
         return new SearchScriptTemplateRequestBuilder(client, this);
     }
 

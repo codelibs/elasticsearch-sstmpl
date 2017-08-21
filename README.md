@@ -11,17 +11,7 @@ Therefore, you can use any script you want in Search Template.
 
 ## Version
 
-| Version   | Elasticsearch |
-|:---------:|:-------------:|
-| master    | 5.5.X         |
-| 5.5.0     | 5.5.1         |
-| 2.4.0     | 2.4.0         |
-| 2.3.1     | 2.3.5         |
-| 2.2.0     | 2.2.2         |
-| 2.1.0     | 2.1.1         |
-| 1.6.0     | 1.6.0         |
-| 1.5.2     | 1.5.2         |
-| 1.4.2     | 1.4.0         |
+[Versions in Maven Repository](http://central.maven.org/maven2/org/codelibs/elasticsearch-sstmpl/)
 
 ### Issues/Questions
 

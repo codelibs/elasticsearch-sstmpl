@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.codelibs</groupId>
 	<artifactId>elasticsearch-sstmpl</artifactId>
-	<version>5.6.0</version>
+	<version>5.6.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<description>This plugin provides Script-based Search Template.</description>
 	<inceptionYear>2011</inceptionYear>

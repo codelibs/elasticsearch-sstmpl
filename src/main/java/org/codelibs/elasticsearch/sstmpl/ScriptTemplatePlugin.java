@@ -8,10 +8,7 @@ import org.codelibs.elasticsearch.sstmpl.action.MultiSearchScriptTemplateAction;
 import org.codelibs.elasticsearch.sstmpl.action.SearchScriptTemplateAction;
 import org.codelibs.elasticsearch.sstmpl.action.TransportMultiSearchScriptTemplateAction;
 import org.codelibs.elasticsearch.sstmpl.action.TransportSearchScriptTemplateAction;
-import org.codelibs.elasticsearch.sstmpl.rest.RestDeleteSearchScriptTemplateAction;
-import org.codelibs.elasticsearch.sstmpl.rest.RestGetSearchScriptTemplateAction;
 import org.codelibs.elasticsearch.sstmpl.rest.RestMultiSearchScriptTemplateAction;
-import org.codelibs.elasticsearch.sstmpl.rest.RestPutSearchScriptTemplateAction;
 import org.codelibs.elasticsearch.sstmpl.rest.RestRenderSearchScriptTemplateAction;
 import org.codelibs.elasticsearch.sstmpl.rest.RestSearchScriptTemplateAction;
 import org.elasticsearch.action.ActionRequest;
@@ -49,9 +46,6 @@ public class ScriptTemplatePlugin extends Plugin implements ActionPlugin {
         return Arrays.asList(//
                 new RestSearchScriptTemplateAction(settings, restController), //
                 new RestMultiSearchScriptTemplateAction(settings, restController), //
-                new RestGetSearchScriptTemplateAction(settings, restController), //
-                new RestPutSearchScriptTemplateAction(settings, restController), //
-                new RestDeleteSearchScriptTemplateAction(settings, restController), //
                 new RestRenderSearchScriptTemplateAction(settings, restController));
     }
 }

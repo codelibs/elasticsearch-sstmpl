@@ -23,7 +23,9 @@ import static org.elasticsearch.rest.RestRequest.Method.GET;
 import static org.elasticsearch.rest.RestRequest.Method.POST;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.codelibs.elasticsearch.sstmpl.action.MultiSearchScriptTemplateAction;
@@ -41,7 +43,14 @@ import org.elasticsearch.rest.action.search.RestSearchAction;
 
 public class RestMultiSearchScriptTemplateAction extends BaseRestHandler {
 
-    private static final Set<String> RESPONSE_PARAMS = Collections.singleton(RestSearchAction.TYPED_KEYS_PARAM);
+    private static final Set<String> RESPONSE_PARAMS;
+
+    static {
+        final Set<String> responseParams = new HashSet<>(
+            Arrays.asList(RestSearchAction.TYPED_KEYS_PARAM, RestSearchAction.TOTAL_HIT_AS_INT_PARAM)
+        );
+        RESPONSE_PARAMS = Collections.unmodifiableSet(responseParams);
+    }
 
     private final boolean allowExplicitIndex;
 
@@ -55,6 +64,11 @@ public class RestMultiSearchScriptTemplateAction extends BaseRestHandler {
         controller.registerHandler(POST, "/{index}/_msearch/script_template", this);
         controller.registerHandler(GET, "/{index}/{type}/_msearch/script_template", this);
         controller.registerHandler(POST, "/{index}/{type}/_msearch/script_template", this);
+    }
+
+    @Override
+    public String getName() {
+        return "multi_search_script_template_action";
     }
 
     @Override

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.codelibs</groupId>
 	<artifactId>elasticsearch-sstmpl</artifactId>
-	<version>5.6.1-SNAPSHOT</version>
+	<version>6.6.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<description>This plugin provides Script-based Search Template.</description>
 	<inceptionYear>2011</inceptionYear>
@@ -26,12 +26,12 @@
 		<version>9</version>
 	</parent>
 	<properties>
-		<elasticsearch.version>5.6.5</elasticsearch.version>
+		<elasticsearch.version>6.6.1</elasticsearch.version>
 		<elasticsearch.plugin.classname>org.codelibs.elasticsearch.sstmpl.ScriptTemplatePlugin</elasticsearch.plugin.classname>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<lucene.version>6.6.1</lucene.version>
-		<log4j.version>2.9.1</log4j.version>
+		<lucene.version>7.6.0</lucene.version>
+		<log4j.version>2.11.1</log4j.version>
 	</properties>
 	<build>
 		<plugins>
@@ -112,21 +112,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.codelibs.elasticsearch.module</groupId>
-			<artifactId>lang-groovy</artifactId>
-			<version>${elasticsearch.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy-all</artifactId>
-			<version>2.4.6</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.github.spullara.mustache.java</groupId>
 			<artifactId>compiler</artifactId>
-			<version>0.9.3</version>
+			<version>0.9.6</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -144,7 +132,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>22.0</version>
+			<version>27.1-jre</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

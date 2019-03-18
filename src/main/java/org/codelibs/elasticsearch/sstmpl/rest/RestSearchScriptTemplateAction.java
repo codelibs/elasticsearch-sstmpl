@@ -32,6 +32,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.common.ParseField;
 import org.elasticsearch.common.ParsingException;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.ObjectParser;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -48,37 +49,41 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
 
     private static final Set<String> RESPONSE_PARAMS = Collections.singleton(RestSearchAction.TYPED_KEYS_PARAM);
 
+    private static ParseField ID_FIELD = new ParseField("id");
+    private static ParseField SOURCE_FIELD = new ParseField("source", "inline", "template");
+
+    private static ParseField PARAMS_FIELD = new ParseField("params");
+    private static ParseField EXPLAIN_FIELD = new ParseField("explain");
+    private static ParseField PROFILE_FIELD = new ParseField("profile");
+
     private static final ObjectParser<SearchScriptTemplateRequest, Void> PARSER;
+
     static {
         PARSER = new ObjectParser<>("search_template");
-        PARSER.declareField((parser, request, s) -> request.setScriptParams(parser.map()), new ParseField("params"),
+        PARSER.declareField((parser, request, s) -> request.setScriptParams(parser.map()), PARAMS_FIELD,
                 ObjectParser.ValueType.OBJECT);
-        PARSER.declareString((request, s) -> {
-            request.setScriptType(ScriptType.FILE);
-            request.setScript(s);
-        }, new ParseField("file"));
         PARSER.declareString((request, s) -> {
             request.setScriptType(ScriptType.STORED);
             request.setScript(s);
-        }, new ParseField("id"));
+        }, ID_FIELD);
         PARSER.declareString((request, s) -> {
             request.setScriptLang(s);
         }, new ParseField("lang"));
-        PARSER.declareBoolean(SearchScriptTemplateRequest::setExplain, new ParseField("explain"));
-        PARSER.declareBoolean(SearchScriptTemplateRequest::setProfile, new ParseField("profile"));
+        PARSER.declareBoolean(SearchScriptTemplateRequest::setExplain, EXPLAIN_FIELD);
+        PARSER.declareBoolean(SearchScriptTemplateRequest::setProfile, PROFILE_FIELD);
         PARSER.declareField((parser, request, value) -> {
             request.setScriptType(ScriptType.INLINE);
             if (parser.currentToken() == XContentParser.Token.START_OBJECT) {
                 //convert the template to json which is the only supported XContentType (see CustomMustacheFactory#createEncoder)
                 try (XContentBuilder builder = XContentFactory.jsonBuilder()) {
-                    request.setScript(builder.copyCurrentStructure(parser).string());
+                    request.setScript(Strings.toString(builder.copyCurrentStructure(parser)));
                 } catch (final IOException e) {
                     throw new ParsingException(parser.getTokenLocation(), "Could not parse inline template", e);
                 }
             } else {
                 request.setScript(parser.text());
             }
-        }, new ParseField("inline", "template"), ObjectParser.ValueType.OBJECT_OR_STRING);
+        }, SOURCE_FIELD, ObjectParser.ValueType.OBJECT_OR_STRING);
     }
 
     public RestSearchScriptTemplateAction(final Settings settings, final RestController controller) {
@@ -93,10 +98,15 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
     }
 
     @Override
+    public String getName() {
+        return "search_script_template_action";
+    }
+
+    @Override
     public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
         // Creates the search request with all required params
         final SearchRequest searchRequest = new SearchRequest();
-        RestSearchAction.parseSearchRequest(searchRequest, request, null);
+        RestSearchAction.parseSearchRequest(searchRequest, request, null, size -> searchRequest.source().size(size));
 
         // Creates the search template request
         SearchScriptTemplateRequest searchTemplateRequest;

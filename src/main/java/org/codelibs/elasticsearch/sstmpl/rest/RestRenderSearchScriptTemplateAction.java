@@ -45,6 +45,11 @@ public class RestRenderSearchScriptTemplateAction extends BaseRestHandler {
     }
 
     @Override
+    public String getName() {
+        return "render_search_script_template_action";
+    }
+
+    @Override
     public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
         // Creates the render template request
         SearchScriptTemplateRequest renderRequest;

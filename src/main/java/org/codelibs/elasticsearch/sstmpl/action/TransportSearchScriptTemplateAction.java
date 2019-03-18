@@ -19,12 +19,9 @@
 
 package org.codelibs.elasticsearch.sstmpl.action;
 
-import static org.elasticsearch.script.ScriptContext.Standard.SEARCH;
-
 import java.io.IOException;
 import java.util.Collections;
 
-import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -33,18 +30,16 @@ import org.elasticsearch.action.support.ActionFilters;
 import org.elasticsearch.action.support.HandledTransportAction;
 import org.elasticsearch.cluster.metadata.IndexNameExpressionResolver;
 import org.elasticsearch.common.bytes.BytesArray;
-import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.LoggingDeprecationHandler;
 import org.elasticsearch.common.xcontent.NamedXContentRegistry;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.QueryParseContext;
-import org.elasticsearch.script.CompiledScript;
-import org.elasticsearch.script.ExecutableScript;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptService;
+import org.elasticsearch.script.TemplateScript;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.TransportService;
@@ -101,27 +96,19 @@ public class TransportSearchScriptTemplateAction extends HandledTransportAction<
         final Script script =
                 new Script(searchTemplateRequest.getScriptType(), searchTemplateRequest.getScriptLang(), searchTemplateRequest.getScript(),
                         searchTemplateRequest.getScriptParams() == null ? Collections.emptyMap() : searchTemplateRequest.getScriptParams());
-        final CompiledScript compiledScript = scriptService.compile(script, SEARCH);
-        final ExecutableScript executable = scriptService.executable(compiledScript, script.getParams());
-        final Object result = executable.run();
-        BytesReference source;
-        if (result instanceof String) {
-            source = new BytesArray(result.toString());
-        } else if (result instanceof BytesReference) {
-            source = (BytesReference) result;
-        } else {
-            throw new ElasticsearchException("Query DSL is null.");
-        }
+        final TemplateScript compiledScript = scriptService.compile(script, TemplateScript.CONTEXT).newInstance(script.getParams());
+        String source = compiledScript.execute();
 
         final SearchRequest searchRequest = searchTemplateRequest.getRequest();
-        response.setSource(source);
+        response.setSource(new BytesArray(source));
         if (searchTemplateRequest.isSimulate()) {
             return null;
         }
 
-        try (XContentParser parser = XContentFactory.xContent(XContentType.JSON).createParser(xContentRegistry, source)) {
+        try (XContentParser parser =
+                XContentFactory.xContent(XContentType.JSON).createParser(xContentRegistry, LoggingDeprecationHandler.INSTANCE, source)) {
             final SearchSourceBuilder builder = SearchSourceBuilder.searchSource();
-            builder.parseXContent(new QueryParseContext(parser));
+            builder.parseXContent(parser, false);
             builder.explain(searchTemplateRequest.isExplain());
             builder.profile(searchTemplateRequest.isProfile());
             searchRequest.source(builder);

@@ -123,9 +123,6 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         if (script == null || script.isEmpty()) {
             validationException = addValidationError("template is missing", validationException);
         }
-        if (scriptLang == null || scriptLang.isEmpty()) {
-            validationException = addValidationError("lang is missing", validationException);
-        }
         if (scriptType == null) {
             validationException = addValidationError("template's script type is missing", validationException);
         }

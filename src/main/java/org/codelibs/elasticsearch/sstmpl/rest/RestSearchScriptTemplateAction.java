@@ -65,6 +65,7 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
         PARSER.declareString((request, s) -> {
             request.setScriptType(ScriptType.STORED);
             request.setScript(s);
+            request.setScriptLang(null);
         }, ID_FIELD);
         PARSER.declareString((request, s) -> {
             request.setScriptLang(s);
@@ -111,7 +112,7 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
         // Creates the search template request
         SearchScriptTemplateRequest searchTemplateRequest;
         try (XContentParser parser = request.contentOrSourceParamParser()) {
-            searchTemplateRequest = PARSER.parse(parser, new SearchScriptTemplateRequest(), null);
+            searchTemplateRequest = parse(parser);
         }
         searchTemplateRequest.setRequest(searchRequest);
 

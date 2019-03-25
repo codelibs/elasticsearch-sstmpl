@@ -21,8 +21,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.google.common.io.Files;
-
 public class ScriptTemplatePluginTest {
     ElasticsearchClusterRunner runner;
 
@@ -35,13 +33,6 @@ public class ScriptTemplatePluginTest {
         clusterName = "es-sstmpl-" + System.currentTimeMillis();
         esHomeDir = File.createTempFile("eshome", "");
         esHomeDir.delete();
-
-        final File scriptDir = new File(esHomeDir, "config/node_1/scripts");
-        scriptDir.mkdirs();
-        final File scriptFile = new File(scriptDir, "search_query_2.groovy");
-        Files.write(
-                "'{\"query\":{\"match\":{\"'+my_field+'\":\"'+my_value+'\"}},\"size\":\"'+my_size+'\"}'"
-                        .getBytes(), scriptFile);
 
         runner = new ElasticsearchClusterRunner();
         runner.onBuild(new ElasticsearchClusterRunner.Builder() {
@@ -83,6 +74,15 @@ public class ScriptTemplatePluginTest {
         }
 
         String query;
+
+        query = "{\"script\":{\"lang\":\"mustache\",\"source\":"//
+                + "{\"query\":{\"match\":{\"{{my_field}}\":\"{{my_value}}\"}},\"size\":\"{{my_size}}\"}"//
+                + "}}";
+        try (CurlResponse curlResponse =
+                EcrCurl.post(node, "/_scripts/search_query_1").header("Content-Type", "application/json").body(query).execute()) {
+            final Map<String, Object> contentMap = curlResponse.getContent(EcrCurl.jsonParser);
+            assertThat(true, is(contentMap.get("acknowledged")));
+        }
 
         query = "{\"inline\":{\"query\":{\"match\":{\"{{my_field}}\":\"{{my_value}}\"}},\"size\":\"{{my_size}}\"},"
                 + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
@@ -130,6 +130,20 @@ public class ScriptTemplatePluginTest {
         }
 
         query = "{\"lang\":\"mustache\",\"inline\":{\"query\":{\"match\":{\"{{my_field}}\":\"{{my_value}}\"}},\"size\":\"{{my_size}}\"},"
+                + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
+        try (CurlResponse curlResponse = EcrCurl.post(node, "/" + index + "/" + type + "/_search/script_template").body(query)
+                .header("Content-Type", "application/json").execute()) {
+            final Map<String, Object> contentMap = curlResponse
+                    .getContent(EcrCurl.jsonParser);
+            final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
+                    .get("hits");
+            assertThat(100, is(hitsMap.get("total")));
+            assertThat(
+                    50,
+                    is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
+        }
+
+        query = "{\"id\":\"search_query_1\","
                 + "\"params\":{\"my_field\":\"category\",\"my_value\":\"1\",\"my_size\":\"50\"}}";
         try (CurlResponse curlResponse = EcrCurl.post(node, "/" + index + "/" + type + "/_search/script_template").body(query)
                 .header("Content-Type", "application/json").execute()) {

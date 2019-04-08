@@ -45,7 +45,7 @@ while [ $count -le 1000 ] ; do
   count=`expr $count + 1`
 done
 curl -s -H "Content-Type: application/json" -XPOST "$ES_HOST:$ES_PORT/_refresh" > /dev/null
-curl -s -XPOST "$ES_HOST:$ES_PORT/_cat/indices"
+curl -s "$ES_HOST:$ES_PORT/_cat/indices"
 
 echo "add search template"
 curl -s -H "Content-Type: application/json" -XPOST "$ES_HOST:$ES_PORT/_scripts/search_query_1" \

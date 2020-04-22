@@ -37,7 +37,6 @@ import org.elasticsearch.script.ScriptType;
 
 public class RestRenderSearchScriptTemplateAction extends BaseRestHandler {
     public RestRenderSearchScriptTemplateAction(final Settings settings, final RestController controller) {
-        super(settings);
         controller.registerHandler(GET, "/_render/script_template", this);
         controller.registerHandler(POST, "/_render/script_template", this);
         controller.registerHandler(GET, "/_render/script_template/{id}", this);

@@ -19,26 +19,16 @@
 
 package org.codelibs.elasticsearch.sstmpl.action;
 
-import org.elasticsearch.action.Action;
-import org.elasticsearch.client.ElasticsearchClient;
+import org.elasticsearch.action.ActionType;
 
 public class MultiSearchScriptTemplateAction
-        extends Action<MultiSearchScriptTemplateRequest, MultiSearchScriptTemplateResponse, MultiSearchScriptTemplateRequestBuilder> {
+        extends ActionType<MultiSearchScriptTemplateResponse> {
 
     public static final MultiSearchScriptTemplateAction INSTANCE = new MultiSearchScriptTemplateAction();
+
     public static final String NAME = "indices:data/read/msearch/script_template";
 
     private MultiSearchScriptTemplateAction() {
-        super(NAME);
-    }
-
-    @Override
-    public MultiSearchScriptTemplateResponse newResponse() {
-        return new MultiSearchScriptTemplateResponse();
-    }
-
-    @Override
-    public MultiSearchScriptTemplateRequestBuilder newRequestBuilder(final ElasticsearchClient client) {
-        return new MultiSearchScriptTemplateRequestBuilder(client, this);
+        super(NAME, MultiSearchScriptTemplateResponse::new);
     }
 }

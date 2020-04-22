@@ -36,6 +36,7 @@ import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.NamedXContentRegistry;
 import org.elasticsearch.script.ScriptService;
+import org.elasticsearch.tasks.Task;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.TransportService;
 
@@ -51,15 +52,16 @@ public class TransportMultiSearchScriptTemplateAction
             final TransportService transportService, final ActionFilters actionFilters, final IndexNameExpressionResolver resolver,
             final ScriptService scriptService, final NamedXContentRegistry xContentRegistry,
             final TransportMultiSearchAction multiSearchAction) {
-        super(settings, MultiSearchScriptTemplateAction.NAME, threadPool, transportService, actionFilters, resolver,
-                MultiSearchScriptTemplateRequest::new);
+        super(MultiSearchScriptTemplateAction.NAME, transportService,
+                actionFilters, MultiSearchScriptTemplateRequest::new);
         this.scriptService = scriptService;
         this.xContentRegistry = xContentRegistry;
         this.multiSearchAction = multiSearchAction;
     }
 
     @Override
-    protected void doExecute(final MultiSearchScriptTemplateRequest request,
+    protected void doExecute(final Task task,
+            final MultiSearchScriptTemplateRequest request,
             final ActionListener<MultiSearchScriptTemplateResponse> listener) {
         final List<Integer> originalSlots = new ArrayList<>();
         final MultiSearchRequest multiSearchRequest = new MultiSearchRequest();

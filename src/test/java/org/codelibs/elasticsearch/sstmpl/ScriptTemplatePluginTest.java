@@ -40,7 +40,9 @@ public class ScriptTemplatePluginTest {
             public void build(final int number, final Builder settingsBuilder) {
                 settingsBuilder.put("http.cors.enabled", true);
                 settingsBuilder.put("http.cors.allow-origin", "*");
-                settingsBuilder.putList("discovery.zen.ping.unicast.hosts", "localhost:9301-9310");
+                settingsBuilder.put("discovery.type", "single-node");
+                // settingsBuilder.putList("discovery.seed_hosts", "127.0.0.1:9301");
+                // settingsBuilder.putList("cluster.initial_master_nodes", "127.0.0.1:9301");
             }
         }).build(newConfigs().clusterName(clusterName).numOfNode(1).basePath(esHomeDir.getAbsolutePath()).pluginTypes(
                 "org.codelibs.elasticsearch.sstmpl.ScriptTemplatePlugin"));
@@ -80,7 +82,7 @@ public class ScriptTemplatePluginTest {
                 + "}}";
         try (CurlResponse curlResponse =
                 EcrCurl.post(node, "/_scripts/search_query_1").header("Content-Type", "application/json").body(query).execute()) {
-            final Map<String, Object> contentMap = curlResponse.getContent(EcrCurl.jsonParser);
+            final Map<String, Object> contentMap = curlResponse.getContent(EcrCurl.jsonParser());
             assertThat(true, is(contentMap.get("acknowledged")));
         }
 
@@ -91,10 +93,10 @@ public class ScriptTemplatePluginTest {
                 .header("Content-Type", "application/json")
                 .body(query).execute()) {
             final Map<String, Object> contentMap = curlResponse
-                    .getContent(EcrCurl.jsonParser);
+                    .getContent(EcrCurl.jsonParser());
             final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
                     .get("hits");
-            assertThat(100, is(hitsMap.get("total")));
+            assertThat(100, is(((Map<String, Object>)hitsMap.get("total")).get("value")));
             assertThat(
                     50,
                     is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
@@ -106,10 +108,10 @@ public class ScriptTemplatePluginTest {
                 .header("Content-Type", "application/json")
                 .execute()) {
             final Map<String, Object> contentMap = curlResponse
-                    .getContent(EcrCurl.jsonParser);
+                    .getContent(EcrCurl.jsonParser());
             final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
                     .get("hits");
-            assertThat(1000, is(hitsMap.get("total")));
+            assertThat(1000, is(((Map<String, Object>)hitsMap.get("total")).get("value")));
             assertThat(
                     10,
                     is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
@@ -120,10 +122,10 @@ public class ScriptTemplatePluginTest {
         try (CurlResponse curlResponse = EcrCurl.post(node, "/" + index + "/" + type + "/_search/script_template").body(query)
                 .header("Content-Type", "application/json").execute()) {
             final Map<String, Object> contentMap = curlResponse
-                    .getContent(EcrCurl.jsonParser);
+                    .getContent(EcrCurl.jsonParser());
             final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
                     .get("hits");
-            assertThat(100, is(hitsMap.get("total")));
+            assertThat(100, is(((Map<String, Object>)hitsMap.get("total")).get("value")));
             assertThat(
                     50,
                     is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
@@ -134,10 +136,10 @@ public class ScriptTemplatePluginTest {
         try (CurlResponse curlResponse = EcrCurl.post(node, "/" + index + "/" + type + "/_search/script_template").body(query)
                 .header("Content-Type", "application/json").execute()) {
             final Map<String, Object> contentMap = curlResponse
-                    .getContent(EcrCurl.jsonParser);
+                    .getContent(EcrCurl.jsonParser());
             final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
                     .get("hits");
-            assertThat(100, is(hitsMap.get("total")));
+            assertThat(100, is(((Map<String, Object>)hitsMap.get("total")).get("value")));
             assertThat(
                     50,
                     is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
@@ -148,10 +150,10 @@ public class ScriptTemplatePluginTest {
         try (CurlResponse curlResponse = EcrCurl.post(node, "/" + index + "/" + type + "/_search/script_template").body(query)
                 .header("Content-Type", "application/json").execute()) {
             final Map<String, Object> contentMap = curlResponse
-                    .getContent(EcrCurl.jsonParser);
+                    .getContent(EcrCurl.jsonParser());
             final Map<String, Object> hitsMap = (Map<String, Object>) contentMap
                     .get("hits");
-            assertThat(100, is(hitsMap.get("total")));
+            assertThat(100, is(((Map<String, Object>)hitsMap.get("total")).get("value")));
             assertThat(
                     50,
                     is(((List<Map<String, Object>>) hitsMap.get("hits")).size()));
@@ -174,7 +176,7 @@ public class ScriptTemplatePluginTest {
         try (CurlResponse curlResponse =
                 EcrCurl.post(node, "/_render/script_template").body(query).header("Content-Type", "application/json").execute()) {
             final Map<String, Object> contentMap = curlResponse
-                    .getContent(EcrCurl.jsonParser);
+                    .getContent(EcrCurl.jsonParser());
             final Map<String, Object> queryMap = (Map<String, Object>) contentMap
                     .get("template_output");
             assertThat("50", is(queryMap.get("size").toString()));

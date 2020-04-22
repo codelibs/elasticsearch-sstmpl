@@ -29,7 +29,7 @@ import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
-import org.elasticsearch.common.io.stream.Streamable;
+import org.elasticsearch.common.io.stream.Writeable;
 import org.elasticsearch.common.xcontent.ToXContent;
 import org.elasticsearch.common.xcontent.ToXContentObject;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -40,7 +40,7 @@ public class MultiSearchScriptTemplateResponse extends ActionResponse
     /**
      * A search template response item, holding the actual search template response, or an error message if it failed.
      */
-    public static class Item implements Streamable {
+    public static class Item implements Writeable {
         private SearchScriptTemplateResponse response;
         private Exception exception;
 
@@ -76,16 +76,12 @@ public class MultiSearchScriptTemplateResponse extends ActionResponse
         }
 
         public static Item readItem(final StreamInput in) throws IOException {
-            final Item item = new Item();
-            item.readFrom(in);
-            return item;
+            return new Item(in);
         }
 
-        @Override
-        public void readFrom(final StreamInput in) throws IOException {
+        public Item(final StreamInput in) throws IOException {
             if (in.readBoolean()) {
-                this.response = new SearchScriptTemplateResponse();
-                response.readFrom(in);
+                this.response = new SearchScriptTemplateResponse(in);
             } else {
                 exception = in.readException();
             }
@@ -128,9 +124,8 @@ public class MultiSearchScriptTemplateResponse extends ActionResponse
         return this.items;
     }
 
-    @Override
-    public void readFrom(final StreamInput in) throws IOException {
-        super.readFrom(in);
+    public MultiSearchScriptTemplateResponse(final StreamInput in) throws IOException {
+        super(in);
         items = new Item[in.readVInt()];
         for (int i = 0; i < items.length; i++) {
             items[i] = Item.readItem(in);
@@ -139,7 +134,6 @@ public class MultiSearchScriptTemplateResponse extends ActionResponse
 
     @Override
     public void writeTo(final StreamOutput out) throws IOException {
-        super.writeTo(out);
         out.writeVInt(items.length);
         for (final Item item : items) {
             item.writeTo(out);

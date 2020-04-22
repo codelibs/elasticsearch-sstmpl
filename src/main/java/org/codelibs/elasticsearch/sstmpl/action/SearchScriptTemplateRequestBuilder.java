@@ -27,7 +27,7 @@ import org.elasticsearch.client.ElasticsearchClient;
 import org.elasticsearch.script.ScriptType;
 
 public class SearchScriptTemplateRequestBuilder
-        extends ActionRequestBuilder<SearchScriptTemplateRequest, SearchScriptTemplateResponse, SearchScriptTemplateRequestBuilder> {
+        extends ActionRequestBuilder<SearchScriptTemplateRequest, SearchScriptTemplateResponse> {
 
     SearchScriptTemplateRequestBuilder(final ElasticsearchClient client, final SearchScriptTemplateAction action) {
         super(client, action, new SearchScriptTemplateRequest());

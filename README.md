@@ -11,22 +11,15 @@ Therefore, you can use any script you want in Search Template.
 
 ## Version
 
-[Versions in Maven Repository](http://central.maven.org/maven2/org/codelibs/elasticsearch-sstmpl/)
+[Versions in Maven Repository](https://repo1.maven.org/maven2/org/codelibs/elasticsearch-sstmpl/)
 
 ### Issues/Questions
 
 Please file an [issue](https://github.com/codelibs/elasticsearch-sstmpl/issues "issue").
-(Japanese forum is [here](https://github.com/codelibs/codelibs-ja-forum "here").)
 
 ## Installation
 
-### For 5.x
-
-    $ $ES_HOME/bin/elasticsearch-plugin install org.codelibs:elasticsearch-sstmpl:5.5.0
-
-### For 2.x
-
-    $ $ES_HOME/bin/plugin install org.codelibs/elasticsearch-sstmpl/2.4.0
+    $ $ES_HOME/bin/elasticsearch-plugin install org.codelibs:elasticsearch-sstmpl:7.6.0
 
 ## References
 
@@ -41,55 +34,39 @@ We also provides [Handlebars Lang Plugin](https://github.com/codelibs/elasticsea
 
     GET /_search/script_template
     {
-        "lang": "groovy",
-        "template": "'{\"query\": {\"match\": {\"title\": \"' + query_string + '\"}}}'",
+        "lang": "mustache",
+        "inline": {"query":{"match":{"{{my_field}}":"{{my_value}}"}},"size":"{{my_size}}"},
         "params": {
-            "query_string": "search for these words"
+            "my_field": "category",
+            "my_value": "1",
+            "my_size": "10"
         }
     }
 
 The value of template property is executed as a groovy script.
-
-### File-based pre-registered template
-
-You can register search templates by storing it in the config/scripts directory.
-If you use a groovy script, the script file is below:
-
-    $ echo "'{\"query\": {\"match\": {\"title\": \"' + query_string + '\"}}}'" > $ES_HOME/config/scripts/storedTemplate.groovy
-
-In order to execute the stored template, reference it by it’s name under the template key:
-
-    GET /_search/script_template
-    {
-        "lang": "groovy",
-        "template": {
-            "file": "storedTemplate"
-        },
-        "params": {
-            "query_string": "search for these words"
-        }
-    }
 
 ### Index-based pre-registered template
 
 This plugin is able to call scripts in .script index to create a template.
 To add a search template as a script,
 
-    POST /_search/script_template/groovy/search_query_1
+    POST /_script/search_query_1
     {
-        "template":"'{\"query\": {\"match\": {\"title\": \"' + query_string + '\"}}}'"
+        "script": {
+	    "lang": "mustache",
+            "source": {"query":{"match":{"{{my_field}}":"{{my_value}}"}},"size":"{{my_size}}"}
+	}
     }
 
 and then the search request is:
 
     GET /_search/script_template
     {
-        "lang": "groovy",
-        "template": {
-            "id": "search_query_1"
-        },
+        "id": "search_query_1",
         "params": {
-            "query_string": "search for these words"
+            "my_field": "category",
+            "my_value": "1",
+            "my_size": "10"
         }
     }
 

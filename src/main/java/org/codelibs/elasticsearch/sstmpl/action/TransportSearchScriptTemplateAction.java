@@ -41,6 +41,7 @@ import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptService;
 import org.elasticsearch.script.TemplateScript;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.tasks.Task;
 import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.TransportService;
 
@@ -54,15 +55,16 @@ public class TransportSearchScriptTemplateAction extends HandledTransportAction<
     public TransportSearchScriptTemplateAction(final Settings settings, final ThreadPool threadPool,
             final TransportService transportService, final ActionFilters actionFilters, final IndexNameExpressionResolver resolver,
             final ScriptService scriptService, final TransportSearchAction searchAction, final NamedXContentRegistry xContentRegistry) {
-        super(settings, SearchScriptTemplateAction.NAME, threadPool, transportService, actionFilters, resolver,
-                SearchScriptTemplateRequest::new);
+        super( SearchScriptTemplateAction.NAME,transportService,actionFilters,SearchScriptTemplateRequest::new);
         this.scriptService = scriptService;
         this.searchAction = searchAction;
         this.xContentRegistry = xContentRegistry;
     }
 
     @Override
-    protected void doExecute(final SearchScriptTemplateRequest request, final ActionListener<SearchScriptTemplateResponse> listener) {
+    protected void doExecute(final Task task,
+            final SearchScriptTemplateRequest request,
+            final ActionListener<SearchScriptTemplateResponse> listener) {
         final SearchScriptTemplateResponse response = new SearchScriptTemplateResponse();
         try {
             final SearchRequest searchRequest = convert(request, response, scriptService, xContentRegistry);

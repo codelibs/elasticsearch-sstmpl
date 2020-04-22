@@ -70,9 +70,8 @@ public class SearchScriptTemplateResponse extends ActionResponse implements Stat
 
     @Override
     public void writeTo(final StreamOutput out) throws IOException {
-        super.writeTo(out);
         out.writeOptionalBytesReference(source);
-        out.writeOptionalStreamable(response);
+        out.writeOptionalWriteable(response);
     }
 
     public static SearchScriptTemplateResponse fromXContent(XContentParser parser) throws IOException {
@@ -99,11 +98,10 @@ public class SearchScriptTemplateResponse extends ActionResponse implements Stat
         return searchTemplateResponse;
     }
 
-    @Override
-    public void readFrom(final StreamInput in) throws IOException {
-        super.readFrom(in);
+    public  SearchScriptTemplateResponse(final StreamInput in) throws IOException {
+        super(in);
         source = in.readOptionalBytesReference();
-        response = in.readOptionalStreamable(SearchResponse::new);
+        response = in.readOptionalWriteable(SearchResponse::new);
     }
 
     @Override

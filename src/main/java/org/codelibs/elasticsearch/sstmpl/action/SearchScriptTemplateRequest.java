@@ -142,10 +142,10 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
         return validationException;
     }
 
-    @Override
-    public void readFrom(final StreamInput in) throws IOException {
-        super.readFrom(in);
-        request = in.readOptionalStreamable(SearchRequest::new);
+    public SearchScriptTemplateRequest(final StreamInput in)
+            throws IOException {
+        super(in);
+        request = in.readOptionalWriteable(SearchRequest::new);
         simulate = in.readBoolean();
         explain = in.readBoolean();
         profile = in.readBoolean();
@@ -160,7 +160,7 @@ public class SearchScriptTemplateRequest extends ActionRequest implements Compos
     @Override
     public void writeTo(final StreamOutput out) throws IOException {
         super.writeTo(out);
-        out.writeOptionalStreamable(request);
+        out.writeOptionalWriteable(request);
         out.writeBoolean(simulate);
         out.writeBoolean(explain);
         out.writeBoolean(profile);

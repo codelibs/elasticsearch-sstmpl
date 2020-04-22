@@ -47,7 +47,7 @@ public class RestMultiSearchScriptTemplateAction extends BaseRestHandler {
 
     static {
         final Set<String> responseParams = new HashSet<>(
-            Arrays.asList(RestSearchAction.TYPED_KEYS_PARAM, RestSearchAction.TOTAL_HIT_AS_INT_PARAM)
+            Arrays.asList(RestSearchAction.TYPED_KEYS_PARAM, RestSearchAction.TOTAL_HITS_AS_INT_PARAM)
         );
         RESPONSE_PARAMS = Collections.unmodifiableSet(responseParams);
     }
@@ -55,7 +55,6 @@ public class RestMultiSearchScriptTemplateAction extends BaseRestHandler {
     private final boolean allowExplicitIndex;
 
     public RestMultiSearchScriptTemplateAction(final Settings settings, final RestController controller) {
-        super(settings);
         this.allowExplicitIndex = MULTI_ALLOW_EXPLICIT_INDEX.get(settings);
 
         controller.registerHandler(GET, "/_msearch/script_template", this);

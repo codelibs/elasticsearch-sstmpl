@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.elasticsearch.Version;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionRequestValidationException;
 import org.elasticsearch.action.CompositeIndicesRequest;
@@ -39,6 +38,9 @@ public class MultiSearchScriptTemplateRequest extends ActionRequest implements C
     private List<SearchScriptTemplateRequest> requests = new ArrayList<>();
 
     private IndicesOptions indicesOptions = IndicesOptions.strictExpandOpenAndForbidClosed();
+
+    public MultiSearchScriptTemplateRequest() {
+    }
 
     /**
      * Add a search template request to execute. Note, the order is important, the search response will be returned in the
@@ -108,21 +110,17 @@ public class MultiSearchScriptTemplateRequest extends ActionRequest implements C
         return this;
     }
 
-    @Override
-    public void readFrom(final StreamInput in) throws IOException {
-        super.readFrom(in);
-        if (in.getVersion().onOrAfter(Version.V_5_5_0)) {
-            maxConcurrentSearchRequests = in.readVInt();
-        }
-        requests = in.readStreamableList(SearchScriptTemplateRequest::new);
+    public MultiSearchScriptTemplateRequest(final StreamInput in)
+            throws IOException {
+        super(in);
+        maxConcurrentSearchRequests = in.readVInt();
+        requests = in.readList(SearchScriptTemplateRequest::new);
     }
 
     @Override
     public void writeTo(final StreamOutput out) throws IOException {
         super.writeTo(out);
-        if (out.getVersion().onOrAfter(Version.V_5_5_0)) {
-            out.writeVInt(maxConcurrentSearchRequests);
-        }
-        out.writeStreamableList(requests);
+        out.writeVInt(maxConcurrentSearchRequests);
+        out.writeList(requests);
     }
 }

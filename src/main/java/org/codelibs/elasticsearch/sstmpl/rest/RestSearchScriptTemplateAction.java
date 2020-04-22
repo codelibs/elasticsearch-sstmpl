@@ -88,8 +88,6 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
     }
 
     public RestSearchScriptTemplateAction(final Settings settings, final RestController controller) {
-        super(settings);
-
         controller.registerHandler(GET, "/_search/script_template", this);
         controller.registerHandler(POST, "/_search/script_template", this);
         controller.registerHandler(GET, "/{index}/_search/script_template", this);

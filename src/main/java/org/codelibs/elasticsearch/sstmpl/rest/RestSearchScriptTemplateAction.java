@@ -23,21 +23,23 @@ import static org.elasticsearch.rest.RestRequest.Method.GET;
 import static org.elasticsearch.rest.RestRequest.Method.POST;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.codelibs.elasticsearch.sstmpl.action.SearchScriptTemplateAction;
 import org.codelibs.elasticsearch.sstmpl.action.SearchScriptTemplateRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.node.NodeClient;
-import org.elasticsearch.common.ParseField;
+import org.elasticsearch.xcontent.ParseField;
 import org.elasticsearch.common.ParsingException;
 import org.elasticsearch.common.Strings;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.xcontent.ObjectParser;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.common.xcontent.XContentParser;
+import org.elasticsearch.xcontent.ObjectParser;
+import org.elasticsearch.xcontent.XContentBuilder;
+import org.elasticsearch.xcontent.XContentFactory;
+import org.elasticsearch.xcontent.XContentParser;
 import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestRequest;
@@ -88,12 +90,6 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
     }
 
     public RestSearchScriptTemplateAction(final Settings settings, final RestController controller) {
-        controller.registerHandler(GET, "/_search/script_template", this);
-        controller.registerHandler(POST, "/_search/script_template", this);
-        controller.registerHandler(GET, "/{index}/_search/script_template", this);
-        controller.registerHandler(POST, "/{index}/_search/script_template", this);
-        controller.registerHandler(GET, "/{index}/{type}/_search/script_template", this);
-        controller.registerHandler(POST, "/{index}/{type}/_search/script_template", this);
     }
 
     @Override
@@ -102,10 +98,22 @@ public class RestSearchScriptTemplateAction extends BaseRestHandler {
     }
 
     @Override
+    public List<Route> routes() {
+        return Collections.unmodifiableList(Arrays.asList(
+                new Route(GET, "/_search/script_template"),
+                new Route(POST, "/_search/script_template"),
+                new Route(GET, "/{index}/_search/script_template"),
+                new Route(POST, "/{index}/_search/script_template"),
+                new Route(GET, "/{index}/{type}/_search/script_template"),
+                new Route(POST, "/{index}/{type}/_search/script_template")
+        ));
+    }
+
+    @Override
     public RestChannelConsumer prepareRequest(final RestRequest request, final NodeClient client) throws IOException {
         // Creates the search request with all required params
         final SearchRequest searchRequest = new SearchRequest();
-        RestSearchAction.parseSearchRequest(searchRequest, request, null, size -> searchRequest.source().size(size));
+        RestSearchAction.parseSearchRequest(searchRequest, request, null, client.getNamedWriteableRegistry(), size -> searchRequest.source().size(size));
 
         // Creates the search template request
         SearchScriptTemplateRequest searchTemplateRequest;

@@ -23,12 +23,15 @@ import static org.elasticsearch.rest.RestRequest.Method.GET;
 import static org.elasticsearch.rest.RestRequest.Method.POST;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.codelibs.elasticsearch.sstmpl.action.SearchScriptTemplateAction;
 import org.codelibs.elasticsearch.sstmpl.action.SearchScriptTemplateRequest;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.xcontent.XContentParser;
+import org.elasticsearch.xcontent.XContentParser;
 import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestRequest;
@@ -37,15 +40,21 @@ import org.elasticsearch.script.ScriptType;
 
 public class RestRenderSearchScriptTemplateAction extends BaseRestHandler {
     public RestRenderSearchScriptTemplateAction(final Settings settings, final RestController controller) {
-        controller.registerHandler(GET, "/_render/script_template", this);
-        controller.registerHandler(POST, "/_render/script_template", this);
-        controller.registerHandler(GET, "/_render/script_template/{id}", this);
-        controller.registerHandler(POST, "/_render/script_template/{id}", this);
     }
 
     @Override
     public String getName() {
         return "render_search_script_template_action";
+    }
+
+    @Override
+    public List<Route> routes() {
+        return Collections.unmodifiableList(Arrays.asList(
+                new Route(GET, "/_render/script_template"),
+                new Route(POST, "/_render/script_template"),
+                new Route(GET, "/_render/script_template/{id}"),
+                new Route(POST, "/_render/script_template/{id}")
+        ));
     }
 
     @Override

@@ -23,10 +23,7 @@ import static org.elasticsearch.rest.RestRequest.Method.GET;
 import static org.elasticsearch.rest.RestRequest.Method.POST;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.codelibs.elasticsearch.sstmpl.action.MultiSearchScriptTemplateAction;
 import org.codelibs.elasticsearch.sstmpl.action.MultiSearchScriptTemplateRequest;
@@ -56,18 +53,23 @@ public class RestMultiSearchScriptTemplateAction extends BaseRestHandler {
 
     public RestMultiSearchScriptTemplateAction(final Settings settings, final RestController controller) {
         this.allowExplicitIndex = MULTI_ALLOW_EXPLICIT_INDEX.get(settings);
-
-        controller.registerHandler(GET, "/_msearch/script_template", this);
-        controller.registerHandler(POST, "/_msearch/script_template", this);
-        controller.registerHandler(GET, "/{index}/_msearch/script_template", this);
-        controller.registerHandler(POST, "/{index}/_msearch/script_template", this);
-        controller.registerHandler(GET, "/{index}/{type}/_msearch/script_template", this);
-        controller.registerHandler(POST, "/{index}/{type}/_msearch/script_template", this);
     }
 
     @Override
     public String getName() {
         return "multi_search_script_template_action";
+    }
+
+    @Override
+    public List<Route> routes() {
+        return Collections.unmodifiableList(Arrays.asList(
+                new Route(GET, "/_msearch/script_template"),
+                new Route(POST, "/_msearch/script_template"),
+                new Route(GET, "/{index}/_msearch/script_template"),
+                new Route(POST, "/{index}/_msearch/script_template"),
+                new Route(GET, "/{index}/{type}/_msearch/script_template"),
+                new Route(POST, "/{index}/{type}/_msearch/script_template")
+        ));
     }
 
     @Override

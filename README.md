@@ -19,7 +19,7 @@ Please file an [issue](https://github.com/codelibs/elasticsearch-sstmpl/issues "
 
 ## Installation
 
-    $ $ES_HOME/bin/elasticsearch-plugin install org.codelibs:elasticsearch-sstmpl:7.6.0
+    $ $ES_HOME/bin/elasticsearch-plugin install org.codelibs:elasticsearch-sstmpl:7.16.3
 
 ## References
 
